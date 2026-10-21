@@ -11,6 +11,11 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD:}
 
 server:
   port: ${SERVER_PORT:8080}
@@ -23,3 +28,7 @@ app:
   admin:
     email: ${ADMIN_EMAIL:admin@sillicon-rally.local}
     password: ${ADMIN_PASSWORD:change-me-before-an-event}
+  session:
+    token-ttl: ${APP_SESSION_TOKEN_TTL:PT12H}
+  realtime:
+    leaderboard-channel: ${APP_REALTIME_LEADERBOARD_CHANNEL:sillicon-rally:leaderboard}
