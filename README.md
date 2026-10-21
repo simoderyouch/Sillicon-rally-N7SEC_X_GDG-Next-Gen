@@ -51,11 +51,11 @@ The backend uses short-lived in-memory opaque tokens in `X-Team-Token` and `X-Ad
 Read [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/GAME_DEVELOPMENT.md](docs/GAME_DEVELOPMENT.md) before assigning game work. Each team creates one `game/<slug>` branch, then runs:
 
 ```bash
-./scripts/new-game.sh inbox-triage "Inbox Triage" 100
+./scripts/new-game.sh inbox-triage
 ./scripts/check.sh
 ```
 
-The generator creates an isolated frontend game folder and a draft mission migration. A game completes through a callback; the shared runner submits the score to the backend, so game developers do not need to build or modify scoring endpoints.
+The generator creates an isolated frontend game folder and an optional private validation-endpoint package. A game completes through a callback; the shared runner submits the score to the locked backend route, so game developers never build, call, or modify scoring endpoints. A private endpoint may validate game-specific answers but cannot record points. Read [frontend/src/games/README.md](frontend/src/games/README.md) before starting a game.
 
 `frontend/src/games/intake/` is a deliberately small working reference game. It demonstrates the full flow: a game component receives a mission, reports completion through `onComplete`, and the shared runner sends its score to the API. New game teams should copy the template, not edit this reference game.
 

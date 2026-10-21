@@ -4,7 +4,6 @@ set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 GAMES_DIR="$ROOT/frontend/src/games"
-MIGRATIONS_DIR="$ROOT/backend/src/main/resources/db/migration"
 has_error=0
 
 for directory in "$GAMES_DIR"/*; do
@@ -23,10 +22,6 @@ for directory in "$GAMES_DIR"/*; do
   fi
   if ! find "$directory" -maxdepth 1 -name '*.test.tsx' -print -quit | grep -q .; then
     echo "Game '$slug' needs at least one *.test.tsx file" >&2
-    has_error=1
-  fi
-  if ! grep -rl "'$slug'" "$MIGRATIONS_DIR" --include='V*__*.sql' >/dev/null 2>&1; then
-    echo "Game '$slug' has no matching Flyway mission migration" >&2
     has_error=1
   fi
 done

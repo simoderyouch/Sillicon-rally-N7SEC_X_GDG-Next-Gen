@@ -1,0 +1,8 @@
+# Platform-owned code. Enable "Require review from Code Owners" in branch protection.
+/backend/ @simoderyouch
+/scripts/ @simoderyouch
+/.github/ @simoderyouch
+/frontend/src/api/ @simoderyouch
+/frontend/src/pages/ @simoderyouch
+/frontend/src/games/registry.ts @simoderyouch
+/frontend/src/games/types.ts @simoderyouch

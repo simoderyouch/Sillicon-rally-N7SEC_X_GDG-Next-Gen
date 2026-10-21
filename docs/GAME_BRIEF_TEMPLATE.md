@@ -34,9 +34,10 @@ Copy this brief for every game team before development starts. A clear brief pro
 
 ## Acceptance criteria
 
-- [ ] The game lives only in `frontend/src/games/<slug>/`.
+- [ ] Game code lives in `frontend/src/games/<slug>/`, with an optional isolated private endpoint in its matching `backend/.../games/<slug>/` package.
 - [ ] It calls `onComplete` once with a score between `0` and `mission.maxScore`.
 - [ ] It includes at least one focused test.
-- [ ] It has a matching draft Flyway mission migration.
+- [ ] If needed, server-only validation lives only in its generated private game endpoint package; it does not write scores or add migrations.
+- [ ] The platform owner has received the slug, title, description, and maximum score needed to register the mission.
 - [ ] `./scripts/check.sh` passes.
 - [ ] Reviewer can complete the game from a fresh team session.

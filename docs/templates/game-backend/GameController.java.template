@@ -1,0 +1,28 @@
+package com.silliconrally.api.games.__GAME_PACKAGE__;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * Private game endpoint. It is intentionally isolated from shared services and score persistence.
+ * Validate a game-specific answer here, return the result, then let the frontend call onComplete.
+ */
+@RestController
+@RequestMapping("/api/v1/games/__GAME_SLUG__")
+public class GameController {
+  public record VerifyRequest(@NotBlank String answer) {}
+
+  public record VerifyResponse(boolean correct, String feedback) {}
+
+  @PostMapping("/verify")
+  public VerifyResponse verify(@Valid @RequestBody VerifyRequest request) {
+    // TODO: Replace this safe placeholder with this game's own validation logic.
+    // Do not inject ScoreService, modify shared entities, or write to the database here.
+    boolean correct = "replace-me".equalsIgnoreCase(request.answer().trim());
+    return new VerifyResponse(correct, correct ? "Correct." : "Try again.");
+  }
+}

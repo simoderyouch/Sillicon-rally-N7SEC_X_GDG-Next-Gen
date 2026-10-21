@@ -6,6 +6,30 @@ on:
     branches: [main]
 
 jobs:
+  game-boundary:
+    if: startsWith(github.head_ref, 'game/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Enforce isolated game ownership
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          slug="${HEAD_REF#game/}"
+          frontend_allowed="frontend/src/games/${slug}/"
+          package_slug=$(printf '%s' "$slug" | tr '-' '_')
+          backend_allowed="backend/src/main/java/com/silliconrally/api/games/${package_slug}/"
+          changed_files=$(git diff --name-only "$BASE_SHA" HEAD)
+          for file in $changed_files; do
+            case "$file" in
+              "$frontend_allowed"* | "$backend_allowed"*) ;;
+              *) echo "Game branch may modify only ${frontend_allowed} and ${backend_allowed}; blocked file: ${file}" >&2; exit 1 ;;
+            esac
+          done
+
   frontend:
     runs-on: ubuntu-latest
     defaults:

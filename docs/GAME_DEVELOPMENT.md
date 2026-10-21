@@ -22,7 +22,9 @@ When the player finishes, call:
 onComplete({ score: 80, completed: true, details: { attempts: 2 } });
 ```
 
-The shared `GameRunner` sends that result to `POST /api/v1/games/{slug}/score`, shows a failure if the server rejects it, and returns the player to the game list after success.
+The shared `GameRunner`—not your game component—sends that result to the locked `POST /api/v1/games/{slug}/score`, shows a failure if the server rejects it, and returns the player to the game list after success.
+
+**Never import the shared API client or call the score route.** The only permitted direct request is to your own optional private validation endpoint, through the generated local `gameApi.ts` file. That endpoint is described below.
 
 ## Server rules
 
@@ -32,7 +34,7 @@ The shared `GameRunner` sends that result to `POST /api/v1/games/{slug}/score`, 
 - `0 <= score <= mission.maxScore`.
 - The backend retains only a team's best score for a game.
 
-For this first skeleton the backend validates the score range and session, but it cannot prove all browser-game answers. Treat it as the common score pipeline. Before the live event, platform owners should add server validation for games where cheating would meaningfully affect rankings.
+For this first skeleton the shared backend validates the score range and session, but it cannot prove all browser-game answers. Games that need stronger checking can add a private game endpoint for validation; the endpoint returns a validation result, then the frontend calls `onComplete` when appropriate. It never records points itself.
 
 ## Folder contract
 
@@ -44,8 +46,17 @@ frontend/src/games/<game-slug>/
 └── helpers.ts      # optional, scoped game utilities
 ```
 
+Optional private server validation lives in only this matching location:
+
+```text
+backend/src/main/java/com/silliconrally/api/games/<game_slug>/
+└── GameController.java  # e.g. POST /api/v1/games/<game-slug>/verify
+```
+
+The `new-game.sh` generator creates both isolated locations. The private controller is deliberately not connected to the database or score service. Keep it that way: validate an answer or issue a hint, then let `onComplete` use the shared score pipeline.
+
 Avoid adding game state to the global application. Keep timers, answer selection, animations, and local state inside the game folder.
 
-## Registration migration
+## Mission registration
 
-Each game has a Flyway migration in `backend/src/main/resources/db/migration/`. The generated migration inserts its mission as `DRAFT`; an organiser or platform owner changes it to `PUBLISHED` when it is ready for players.
+Tell the platform owner the final slug, title, description, and maximum score from your game brief. They register and publish the mission separately. Do not add a Flyway migration. This prevents several game teams from editing the backend skeleton and creating migration conflicts.
