@@ -13,12 +13,12 @@ export function GameRunner() {
     onSuccess: () => navigate("/games"),
   });
 
-  if (!token) return <section><p>No active team session.</p><Link to="/play">Join a team</Link></section>;
-  if (missions.isPending) return <section><p>Loading game…</p></section>;
+  if (!token) return <section className="empty-state"><p className="eyebrow">No session found</p><h1>Start at the first checkpoint.</h1><Link className="button-primary" to="/play">Join a team <span aria-hidden="true">→</span></Link></section>;
+  if (missions.isPending) return <section className="loading-state"><p className="eyebrow">Mission loading</p><h1>Setting up your checkpoint…</h1></section>;
   const mission = missions.data?.find((item) => item.slug === slug);
   const definition = games[slug];
-  if (!mission || !definition) return <section><h1>Game unavailable</h1><p>This mission is not registered in the frontend yet.</p><Link to="/games">Back to games</Link></section>;
+  if (!mission || !definition) return <section className="empty-state"><p className="eyebrow">Detour required</p><h1>Mission unavailable.</h1><p>This checkpoint is not ready in the frontend yet.</p><Link className="button-primary" to="/games">Back to route <span aria-hidden="true">→</span></Link></section>;
   const Component = definition.component;
 
-  return <section><Component mission={mission} disabled={submit.isPending} onComplete={(result) => submit.mutate(result)} />{submit.error && <p className="error">{submit.error.message}</p>}</section>;
+  return <section className="game-runner"><div className="game-runner-meta"><Link to="/games">← Route map</Link><span>Mission briefing</span></div><Component mission={mission} disabled={submit.isPending} onComplete={(result) => submit.mutate(result)} />{submit.error && <p className="error" role="alert">{submit.error.message}</p>}</section>;
 }

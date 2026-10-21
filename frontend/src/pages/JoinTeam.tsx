@@ -22,11 +22,23 @@ export function JoinTeam() {
     } finally { setLoading(false); }
   }
 
-  return <section><h1>Join the game</h1><p>Enter your team name to begin.</p><form onSubmit={submit}>
-    <label>Team name<input required value={teamName} onChange={(e) => setTeamName(e.target.value)} /></label>
-    <label>Join code <small>(optional in local development)</small><input value={joinCode} onChange={(e) => setJoinCode(e.target.value)} /></label>
-    <button disabled={loading}>{loading ? "Joining…" : "Join team"}</button>
-    {error && <p className="error">{error}</p>}
-  </form></section>;
+  return <section className="join-layout">
+    <div className="join-intro">
+      <p className="eyebrow">Checkpoint 00 · team check-in</p>
+      <h1>Put your crew<br /><em>on the route.</em></h1>
+      <p className="lede">Choose the team name your crew will carry through every mission and up the standings.</p>
+      <div className="rally-note"><span aria-hidden="true">↗</span><p><strong>One name. One score.</strong><br />Your team session keeps your mission progress together on this device.</p></div>
+    </div>
+    <div className="form-card join-card">
+      <p className="form-kicker">Rally access</p>
+      <h2>Start a team session</h2>
+      <form onSubmit={submit}>
+        <label>Team name<input required autoFocus placeholder="e.g. Packet Pilots" value={teamName} onChange={(e) => setTeamName(e.target.value)} /></label>
+        <label>Join code <small>Optional in local development</small><input placeholder="Enter event code" value={joinCode} onChange={(e) => setJoinCode(e.target.value)} /></label>
+        <button className="button-primary" disabled={loading}>{loading ? "Joining rally…" : "Join rally"}<span aria-hidden="true">→</span></button>
+        {error && <p className="error" role="alert">{error}</p>}
+      </form>
+    </div>
+  </section>;
 }
 
