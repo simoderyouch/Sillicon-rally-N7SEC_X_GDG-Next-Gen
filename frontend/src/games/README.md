@@ -31,6 +31,10 @@ export const game: GameDefinition = {
 
 The app finds this automatically. Do not edit a central registry or route file.
 
+## Your game already has a play box
+
+The shared runner places every registered game inside the platform's dark arcade cabinet: a mission marquee, protected screen area, and team/score footer. Build only the game interaction inside your component; do not recreate the global frame. The starter template includes a smaller workbench panel that you can replace with your own puzzle, timer, or challenge UI.
+
 ## Sending points: use the callback, never the score API
 
 The platform gives your component these props:
