@@ -57,6 +57,8 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/GAME_DEVELOPMENT.md](docs/GAME
 
 The generator creates an isolated frontend game folder and a draft mission migration. A game completes through a callback; the shared runner submits the score to the backend, so game developers do not need to build or modify scoring endpoints.
 
+`frontend/src/games/intake/` is a deliberately small working reference game. It demonstrates the full flow: a game component receives a mission, reports completion through `onComplete`, and the shared runner sends its score to the API. New game teams should copy the template, not edit this reference game.
+
 ## Project structure
 
 ```text
