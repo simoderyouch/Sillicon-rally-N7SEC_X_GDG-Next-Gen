@@ -13,12 +13,12 @@ export function GameRunner() {
     onSuccess: () => navigate("/games"),
   });
 
-  if (!token) return <section className="empty-state"><p className="eyebrow">Session missing</p><h1>Request lab access.</h1><Link className="button-primary" to="/play">Join a team <span aria-hidden="true">→</span></Link></section>;
-  if (missions.isPending) return <section className="loading-state"><p className="eyebrow">Challenge loading</p><h1>Provisioning your lab…</h1></section>;
+  if (!token) return <section className="empty-state"><p className="eyebrow">Session missing</p><h1>Join the challenge.</h1><Link className="button-primary" to="/play">Join a team <span aria-hidden="true">→</span></Link></section>;
+  if (missions.isPending) return <section className="loading-state"><p className="eyebrow">Challenge loading</p><h1>Preparing your challenge…</h1></section>;
   const mission = missions.data?.find((item) => item.slug === slug);
   const definition = games[slug];
-  if (!mission || !definition) return <section className="empty-state"><p className="eyebrow">Challenge unavailable</p><h1>Lab not ready.</h1><p>This challenge is not yet available in the player client.</p><Link className="button-primary" to="/games">Back to board <span aria-hidden="true">→</span></Link></section>;
+  if (!mission || !definition) return <section className="empty-state"><p className="eyebrow">Challenge unavailable</p><h1>Challenge not ready.</h1><p>This challenge is not yet available in the player client.</p><Link className="button-primary" to="/games">Back to board <span aria-hidden="true">→</span></Link></section>;
   const Component = definition.component;
 
-  return <section className="game-runner"><div className="game-runner-meta"><Link to="/games">← Back to challenge board</Link><span>Training sandbox · no real systems</span></div><div className="game-cabinet"><div className="cabinet-marquee"><span className="cabinet-light" aria-hidden="true" /> <strong>{mission.title}</strong><span>ISOLATED LAB</span></div><div className="cabinet-screen"><Component mission={mission} disabled={submit.isPending} onComplete={(result) => submit.mutate(result)} /></div><div className="cabinet-footer"><span>Session: {sessionStorage.getItem("teamName") ?? "Team"}</span><span>Score limit: {mission.maxScore}</span><span>Authorised exercise only</span></div></div>{submit.error && <p className="error" role="alert">{submit.error.message}</p>}</section>;
+  return <section className="game-runner"><div className="game-runner-meta"><Link to="/games">← Back to challenge board</Link><span>Training challenge · no real systems</span></div><div className="game-cabinet"><div className="cabinet-marquee"><span className="cabinet-light" aria-hidden="true" /> <strong>{mission.title}</strong><span>CHALLENGE ACTIVE</span></div><div className="cabinet-screen"><Component mission={mission} disabled={submit.isPending} onComplete={(result) => submit.mutate(result)} /></div><div className="cabinet-footer"><span>Session: {sessionStorage.getItem("teamName") ?? "Team"}</span><span>Score limit: {mission.maxScore}</span><span>Authorised exercise only</span></div></div>{submit.error && <p className="error" role="alert">{submit.error.message}</p>}</section>;
 }

@@ -10,12 +10,12 @@ export default function App() {
   return (
     <main className="app-shell">
       <header className="site-header">
-        <Link to="/" className="brand" aria-label="N7SEC CTF home">
+        <Link to="/" className="brand" aria-label="Sillicon Rally challenge home">
           <span className="brand-mark" aria-hidden="true">N7</span>
-          <span><strong>Sillicon Rally</strong><em>CTF / LAB</em></span>
+          <span><strong>Sillicon Rally</strong><em>Challenge Grid</em></span>
         </Link>
         <nav className="main-nav" aria-label="Main navigation">
-          <NavLink to="/play">Access lab</NavLink>
+          <NavLink to="/play">Join challenge</NavLink>
           <NavLink to="/leaderboard">Scoreboard</NavLink>
           <NavLink to="/admin">Admin shell</NavLink>
         </nav>

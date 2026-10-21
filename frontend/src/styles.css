@@ -132,7 +132,7 @@ td small { color: #718893; font-family: "IBM Plex Mono", monospace; font-size: .
 .game-runner-meta a { color: #39d9b5; }
 .game-runner-meta span { color: #879da8; }
 .game-cabinet { background: #0b1720; border: 1px solid #3d7485; box-shadow: 0 0 0 5px #09131b, 0 0 36px rgba(57,217,181,.12); overflow: hidden; padding: 8px; position: relative; }
-.game-cabinet::before { color: #4a6b78; content: "AUTHORISED CTF SANDBOX"; font-family: "IBM Plex Mono", monospace; font-size: .5rem; letter-spacing: .18em; position: absolute; right: 13px; top: 65px; transform: rotate(90deg); transform-origin: right top; }
+.game-cabinet::before { color: #4a6b78; content: "AUTHORISED PUZZLE ENVIRONMENT"; font-family: "IBM Plex Mono", monospace; font-size: .5rem; letter-spacing: .18em; position: absolute; right: 13px; top: 65px; transform: rotate(90deg); transform-origin: right top; }
 .cabinet-marquee { align-items: center; background: #112c38; border: 1px solid #386877; color: #dff4f8; display: flex; font-family: "IBM Plex Mono", monospace; font-size: .61rem; gap: 10px; justify-content: space-between; letter-spacing: .045em; min-height: 48px; padding: 0 14px; text-transform: uppercase; }
 .cabinet-marquee strong { color: #f1fcff; font-size: .9rem; font-weight: 500; letter-spacing: -.045em; margin-right: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cabinet-marquee > span:last-child { color: #39d9b5; font-size: .54rem; }
