@@ -9,29 +9,22 @@ button { cursor: pointer; }
 button:disabled { cursor: not-allowed; opacity: .5; }
 a { color: inherit; text-decoration: none; }
 
-.app-shell { display: grid; gap: 36px; grid-template-columns: 228px minmax(0, 1fr); margin: 0 auto; max-width: 1480px; min-height: 100vh; padding: 0 34px 26px; }
-.command-rail { border-right: 1px solid var(--border); display: flex; flex-direction: column; min-height: 100vh; padding: 28px 28px 28px 0; position: sticky; top: 0; }
-.app-workspace { min-width: 0; padding-top: 20px; }
-.site-header { align-items: center; border-bottom: 1px solid var(--border); color: var(--muted-foreground); display: flex; font-family: "JetBrains Mono", monospace; font-size: .62rem; justify-content: space-between; letter-spacing: .02em; min-height: 48px; text-transform: uppercase; }
+.app-shell { margin: 0 auto; max-width: 1320px; min-height: 100vh; padding: 0 38px 26px; }
+.site-header { align-items: center; border-bottom: 1px solid var(--border); color: var(--muted-foreground); display: flex; font-family: "JetBrains Mono", monospace; font-size: .62rem; gap: 30px; justify-content: space-between; letter-spacing: .02em; min-height: 72px; text-transform: uppercase; }
 .brand { align-items: center; display: flex; gap: 10px; }
 .brand-mark { align-items: center; background: var(--foreground); border-radius: 7px; color: var(--primary-foreground); display: grid; font-family: "JetBrains Mono", monospace; font-size: .67rem; font-weight: 600; height: 32px; justify-content: center; width: 32px; }
 .brand strong, .brand em { display: block; font-size: .82rem; font-style: normal; font-weight: 600; letter-spacing: -.04em; line-height: .82; text-transform: uppercase; }
 .brand em { color: var(--muted-foreground); font-family: "JetBrains Mono", monospace; font-size: .55rem; letter-spacing: .1em; margin: 5px 0 0; }
-.rail-context { align-items: center; border-bottom: 1px solid var(--border); color: var(--muted-foreground); display: flex; font-family: "JetBrains Mono", monospace; font-size: .55rem; gap: 8px; letter-spacing: .03em; margin-top: 38px; padding-bottom: 14px; text-transform: uppercase; }
-.rail-live-dot, .system-state i { background: var(--success); border-radius: 50%; height: 6px; width: 6px; }
-.main-nav { display: flex; flex-direction: column; gap: 4px; margin-top: 17px; }
-.main-nav a { border-radius: 6px; color: var(--muted-foreground); font-family: "JetBrains Mono", monospace; font-size: .66rem; padding: 9px 11px; text-transform: uppercase; }
+.system-state i { background: var(--success); border-radius: 50%; height: 6px; width: 6px; }
+.main-nav { display: flex; gap: 8px; margin-left: auto; }
+.main-nav a { border-radius: 6px; color: var(--muted-foreground); font-family: "JetBrains Mono", monospace; font-size: .66rem; padding: 8px 11px; text-transform: uppercase; }
 .main-nav a:hover, .main-nav a.active { background: var(--accent); color: var(--foreground); }
-.main-nav a::before { content: "> "; opacity: 0; }
-.main-nav a.active::before { opacity: 1; }
-.rail-footer { border-top: 1px solid var(--border); color: var(--muted-foreground); display: grid; font-family: "JetBrains Mono", monospace; font-size: .55rem; gap: 6px; letter-spacing: .03em; margin-top: auto; padding-top: 16px; text-transform: uppercase; }
-.rail-footer strong { color: #d4d4d8; font-size: .57rem; font-weight: 400; line-height: 1.5; }
 .system-state { align-items: center; color: #d4d4d8; display: inline-flex; gap: 7px; }
 .route-line { align-items: center; border-top: 1px solid var(--border); display: flex; height: 33px; justify-content: space-between; margin-bottom: 28px; position: relative; }
 .route-line::before { background: #d4d4d8; content: ""; height: 1px; left: 0; position: absolute; width: min(30%, 340px); }
 .route-line i { background: var(--background); border: 1px solid #52525b; border-radius: 50%; height: 7px; width: 7px; }
 .route-line i:first-child { background: #d4d4d8; border-color: #d4d4d8; }
-.page-content { min-height: calc(100vh - 154px); }
+.page-content { min-height: calc(100vh - 178px); }
 .site-footer { border-top: 1px solid var(--border); color: var(--muted-foreground); display: flex; font-family: "JetBrains Mono", monospace; font-size: .57rem; justify-content: space-between; letter-spacing: .02em; margin-top: 64px; padding-top: 16px; text-transform: uppercase; }
 
 h1, h2, p { margin-top: 0; }
@@ -179,5 +172,5 @@ blockquote { color: var(--foreground); font-size: clamp(1.13rem, 2.6vw, 1.55rem)
 .game-action-row { align-items: center; display: flex; justify-content: space-between; margin-top: 18px; }
 .game-action-row > span { color: var(--muted-foreground); font-family: "JetBrains Mono", monospace; font-size: .58rem; text-transform: uppercase; }
 
-@media (max-width: 900px) { .app-shell { display: block; padding: 16px 18px 21px; } .command-rail { border-bottom: 1px solid var(--border); border-right: 0; min-height: 0; padding: 0 0 16px; position: relative; } .rail-context, .rail-footer { display: none; } .main-nav { flex-direction: row; flex-wrap: wrap; gap: 5px 18px; margin-top: 17px; } .main-nav a { padding: 4px 0; } .app-workspace { padding-top: 0; } .site-header { min-height: 43px; } .route-line { margin-bottom: 18px; } .join-layout, .admin-login-layout { gap: 36px; grid-template-columns: 1fr; min-height: auto; padding: 40px 0; } .join-card, .admin-login-card { max-width: none; } .mission-board, .leaderboard-page, .admin-dashboard { padding: 24px 0; } .mission-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .admin-grid { grid-template-columns: 1fr; } }
-@media (max-width: 520px) { .site-header { align-items: flex-start; gap: 18px; } .main-nav { gap: 6px 14px; } .main-nav a { font-size: .55rem; } .page-heading { align-items: flex-start; flex-direction: column; gap: 18px; } .team-badge, .event-state { min-width: 0; } .mission-grid { grid-template-columns: 1fr; } .mission-card { min-height: 240px; } .admin-overview { grid-template-columns: 1fr; } .admin-stat { min-height: 138px; } .site-footer { flex-direction: column; gap: 8px; } .game-action-row, .workbench-footer { align-items: flex-start; flex-direction: column; gap: 13px; } .workbench-footer { padding: 15px; } .cabinet-screen { min-height: 350px; padding: 25px 20px; } .cabinet-footer { flex-wrap: wrap; gap: 7px; } .cabinet-footer span:last-child { width: 100%; } th, td { padding-left: 12px; padding-right: 12px; } }
+@media (max-width: 900px) { .app-shell { padding: 0 18px 21px; } .site-header { min-height: 62px; } .main-nav { gap: 4px; } .route-line { margin-bottom: 18px; } .join-layout, .admin-login-layout { gap: 36px; grid-template-columns: 1fr; min-height: auto; padding: 40px 0; } .join-card, .admin-login-card { max-width: none; } .mission-board, .leaderboard-page, .admin-dashboard { padding: 24px 0; } .mission-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .admin-grid { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .site-header { align-items: flex-start; flex-wrap: wrap; gap: 12px; padding: 12px 0; } .main-nav { flex: 1 1 100%; flex-wrap: wrap; gap: 5px; margin-left: 0; } .main-nav a { font-size: .55rem; padding: 7px 8px; } .system-state { display: none; } .page-heading { align-items: flex-start; flex-direction: column; gap: 18px; } .team-badge, .event-state { min-width: 0; } .mission-grid { grid-template-columns: 1fr; } .mission-card { min-height: 240px; } .admin-overview { grid-template-columns: 1fr; } .admin-stat { min-height: 138px; } .site-footer { flex-direction: column; gap: 8px; } .game-action-row, .workbench-footer { align-items: flex-start; flex-direction: column; gap: 13px; } .workbench-footer { padding: 15px; } .cabinet-screen { min-height: 350px; padding: 25px 20px; } .cabinet-footer { flex-wrap: wrap; gap: 7px; } .cabinet-footer span:last-child { width: 100%; } th, td { padding-left: 12px; padding-right: 12px; } }
