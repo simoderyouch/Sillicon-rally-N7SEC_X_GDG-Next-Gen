@@ -31,9 +31,9 @@ export const game: GameDefinition = {
 
 The app finds this automatically. Do not edit a central registry or route file.
 
-## Your game already has a play box
+## Your game already has an isolated challenge console
 
-The shared runner places every registered game inside the platform's dark arcade cabinet: a mission marquee, protected screen area, and team/score footer. Build only the game interaction inside your component; do not recreate the global frame. The starter template includes a smaller workbench panel that you can replace with your own puzzle, timer, or challenge UI.
+The shared runner places every registered game inside the platform's CTF challenge console: an isolated-lab marquee, protected screen area, and team/score footer. Build only the game interaction inside your component; do not recreate the global frame. The starter template includes a smaller workspace panel that you can replace with your own quiz, mail triage, investigation, or safe sandbox UI.
 
 ## Sending points: use the callback, never the score API
 

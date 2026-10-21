@@ -10,14 +10,14 @@ export default function App() {
   return (
     <main className="app-shell">
       <header className="site-header">
-        <Link to="/" className="brand" aria-label="Sillicon Rally home">
-          <span className="brand-mark" aria-hidden="true">SR</span>
-          <span><strong>Sillicon</strong><em>Rally</em></span>
+        <Link to="/" className="brand" aria-label="N7SEC CTF home">
+          <span className="brand-mark" aria-hidden="true">N7</span>
+          <span><strong>Sillicon Rally</strong><em>CTF / LAB</em></span>
         </Link>
         <nav className="main-nav" aria-label="Main navigation">
-          <NavLink to="/play">Join rally</NavLink>
-          <NavLink to="/leaderboard">Standings</NavLink>
-          <NavLink to="/admin">Control room</NavLink>
+          <NavLink to="/play">Access lab</NavLink>
+          <NavLink to="/leaderboard">Scoreboard</NavLink>
+          <NavLink to="/admin">Admin shell</NavLink>
         </nav>
       </header>
       <div className="route-line" aria-hidden="true"><i /><i /><i /><i /></div>
@@ -32,7 +32,7 @@ export default function App() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
       </div>
-      <footer className="site-footer"><span>Sillicon Rally · live mission control</span><span>Play smart. Verify first.</span></footer>
+      <footer className="site-footer"><span>N7SEC · authorised training environment</span><span>Observe. Verify. Defend.</span></footer>
     </main>
   );
 }
