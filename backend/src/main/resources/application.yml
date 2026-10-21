@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: sillicon-rally-api
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/sillicon_rally}
+    username: ${SPRING_DATASOURCE_USERNAME:sillicon}
+    password: ${SPRING_DATASOURCE_PASSWORD:change-me}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  cors:
+    allowed-origin: ${APP_CORS_ALLOWED_ORIGIN:http://localhost:5173}
+  event:
+    open-team-registration: ${OPEN_TEAM_REGISTRATION:true}
+  admin:
+    email: ${ADMIN_EMAIL:admin@sillicon-rally.local}
+    password: ${ADMIN_PASSWORD:change-me-before-an-event}

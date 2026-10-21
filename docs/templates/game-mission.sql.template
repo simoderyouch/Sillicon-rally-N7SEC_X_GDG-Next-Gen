@@ -1,0 +1,2 @@
+INSERT INTO missions (id, slug, title, description, max_score, release_state)
+VALUES ('__MISSION_ID__', '__GAME_SLUG__', '__GAME_TITLE__', 'TODO: add the player-facing mission description.', __MAX_SCORE__, 'DRAFT');

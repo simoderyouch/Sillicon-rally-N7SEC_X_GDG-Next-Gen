@@ -1,0 +1,65 @@
+# Sillicon Rally Next
+
+New implementation of the team cybersecurity game: React frontend, Spring Boot backend (Java 17+), and PostgreSQL.
+
+## What is included
+
+- Team join flow (open registration enabled for local development)
+- Public mission catalogue
+- Admin login and team management skeleton
+- Event open/close and leaderboard lock state
+- Shared server-backed score submission and public leaderboard
+- PostgreSQL schema and mission seed data through Flyway
+- Parallel game-development workflow, game template, PR template, and CI
+
+## Local setup
+
+```bash
+cp .env.example .env
+docker compose up -d postgres
+
+cd backend
+ADMIN_EMAIL=admin@sillicon-rally.local ADMIN_PASSWORD=change-me-before-an-event \
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/sillicon_rally \
+SPRING_DATASOURCE_USERNAME=sillicon SPRING_DATASOURCE_PASSWORD=change-me \
+mvn spring-boot:run
+
+cd ../frontend
+npm install
+npm run dev
+```
+
+The frontend starts on `http://localhost:5173`; the API starts on `http://localhost:8080`.
+
+## Development-only authentication
+
+The backend uses short-lived in-memory opaque tokens in `X-Team-Token` and `X-Admin-Token` headers. This makes the initial API flow easy to inspect, but it must be replaced with secure HTTP-only cookie sessions (or an approved token design), hashed team join codes, rate limits, and a real admin identity provider before an event.
+
+## API skeleton
+
+- `POST /api/v1/team-sessions` — join/create a team
+- `GET /api/v1/me` — current team identity
+- `GET /api/v1/missions` — visible mission catalogue
+- `POST /api/v1/admin/sessions` — admin login
+- `GET|POST|PATCH /api/v1/admin/teams` — manage teams
+- `GET|PATCH /api/v1/admin/event` — view/update event state
+- `POST /api/v1/games/{slug}/score` — save a team game's best score
+- `GET /api/v1/leaderboard` — public ranked teams
+
+## Game team workflow
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/GAME_DEVELOPMENT.md](docs/GAME_DEVELOPMENT.md) before assigning game work. Each team creates one `game/<slug>` branch, then runs:
+
+```bash
+./scripts/new-game.sh inbox-triage "Inbox Triage" 100
+./scripts/check.sh
+```
+
+The generator creates an isolated frontend game folder and a draft mission migration. A game completes through a callback; the shared runner submits the score to the backend, so game developers do not need to build or modify scoring endpoints.
+
+## Project structure
+
+```text
+frontend/  React + Vite + TypeScript
+backend/   Spring Boot + JPA + Flyway
+```
