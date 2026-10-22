@@ -1,12 +1,11 @@
 package com.silliconrally.api.mission;
 
-import java.util.List;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/missions")
 public class MissionController {
-  private final MissionRepository missions;
-  public MissionController(MissionRepository missions) { this.missions = missions; }
-  @GetMapping public List<Mission> list() { return missions.findByReleaseState(MissionReleaseState.PUBLISHED); }
+  private final MissionService missions;
+  public MissionController(MissionService missions) { this.missions = missions; }
+  @GetMapping public java.util.List<MissionDtos.MissionResponse> list() { return missions.listPublished(); }
 }

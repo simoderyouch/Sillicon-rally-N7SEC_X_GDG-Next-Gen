@@ -4,7 +4,7 @@
 * { box-sizing: border-box; }
 html, body { background: var(--background); min-width: 320px; }
 body { margin: 0; min-height: 100vh; }
-button, input { font: inherit; }
+button, input, select { font: inherit; }
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; opacity: .5; }
 a { color: inherit; text-decoration: none; }
@@ -56,9 +56,9 @@ h2 { font-size: 1.42rem; letter-spacing: -.045em; line-height: 1.05; margin-bott
 form { display: grid; gap: 17px; }
 label { color: #d4d4d8; display: grid; font-family: "JetBrains Mono", monospace; font-size: .66rem; gap: 8px; letter-spacing: .01em; }
 label small { color: var(--muted-foreground); font-size: .59rem; letter-spacing: 0; text-transform: none; }
-input { background: var(--background); border: 1px solid var(--input); border-radius: 6px; color: var(--foreground); min-height: 42px; outline: none; padding: 9px 11px; }
+input, select { background: var(--background); border: 1px solid var(--input); border-radius: 6px; color: var(--foreground); min-height: 42px; outline: none; padding: 9px 11px; }
 input::placeholder { color: #71717a; }
-input:focus { border-color: #a1a1aa; box-shadow: 0 0 0 3px rgba(161,161,170,.16); }
+input:focus, select:focus { border-color: #a1a1aa; box-shadow: 0 0 0 3px rgba(161,161,170,.16); }
 .join-card { max-width: 420px; width: 100%; }
 
 .page-heading { align-items: flex-end; display: flex; gap: 30px; justify-content: space-between; margin-bottom: 39px; }
@@ -108,6 +108,10 @@ td small { color: var(--muted-foreground); font-family: "JetBrains Mono", monosp
 .admin-actions h2 { font-size: 1.8rem; }
 .admin-actions p:not(.panel-label) { color: var(--muted-foreground); font-size: .88rem; line-height: 1.5; max-width: 440px; }
 .admin-actions .button-primary { margin-top: 8px; }
+.admin-action-row { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.admin-actions .admin-action-row .button-primary { margin-top: 0; }
+.button-danger { background: transparent; border: 1px solid #7f1d1d; border-radius: 6px; color: #fca5a5; font-size: .76rem; min-height: 40px; padding: 0 14px; }
+.button-danger:not(:disabled):hover { background: rgba(127,29,29,.22); }
 .admin-stat { background: #e4e4e7; border-color: #e4e4e7; color: #18181b; display: flex; flex-direction: column; justify-content: flex-end; }
 .admin-stat span { font-family: "JetBrains Mono", monospace; font-size: 3.6rem; font-weight: 500; letter-spacing: -.12em; line-height: .8; }
 .admin-stat p { font-family: "JetBrains Mono", monospace; font-size: .58rem; line-height: 1.35; margin: 13px 0 0; text-transform: uppercase; }
@@ -122,6 +126,11 @@ td small { color: var(--muted-foreground); font-family: "JetBrains Mono", monosp
 .status-pill.is-active { color: var(--success); }
 .status-pill.is-inactive { color: #f87171; }
 .table-action { background: none; border: 0; color: #e4e4e7; font-family: "JetBrains Mono", monospace; font-size: .6rem; padding: 4px 0; text-decoration: underline; text-underline-offset: 3px; text-transform: uppercase; }
+.admin-missions { align-items: start; display: grid; gap: 22px; grid-template-columns: minmax(280px, .58fr) minmax(0, 1.42fr); margin-top: 22px; }
+.mission-create-card form { gap: 12px; }
+.mission-state-draft { color: #facc15; }
+.mission-state-published { color: var(--success); }
+.mission-state-closed { color: #f87171; }
 
 .empty-state, .loading-state { padding: 86px clamp(0px, 8vw, 120px); }
 .empty-state > p:not(.eyebrow) { color: var(--muted-foreground); margin-bottom: 24px; }
@@ -172,5 +181,5 @@ blockquote { color: var(--foreground); font-size: clamp(1.13rem, 2.6vw, 1.55rem)
 .game-action-row { align-items: center; display: flex; justify-content: space-between; margin-top: 18px; }
 .game-action-row > span { color: var(--muted-foreground); font-family: "JetBrains Mono", monospace; font-size: .58rem; text-transform: uppercase; }
 
-@media (max-width: 900px) { .app-shell { padding: 0 18px 21px; } .site-header { min-height: 62px; } .main-nav { gap: 4px; } .route-line { margin-bottom: 18px; } .join-layout, .admin-login-layout { gap: 36px; grid-template-columns: 1fr; min-height: auto; padding: 40px 0; } .join-card, .admin-login-card { max-width: none; } .mission-board, .leaderboard-page, .admin-dashboard { padding: 24px 0; } .mission-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .admin-grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .app-shell { padding: 0 18px 21px; } .site-header { min-height: 62px; } .main-nav { gap: 4px; } .route-line { margin-bottom: 18px; } .join-layout, .admin-login-layout { gap: 36px; grid-template-columns: 1fr; min-height: auto; padding: 40px 0; } .join-card, .admin-login-card { max-width: none; } .mission-board, .leaderboard-page, .admin-dashboard { padding: 24px 0; } .mission-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .admin-grid, .admin-missions { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .site-header { align-items: flex-start; flex-wrap: wrap; gap: 12px; padding: 12px 0; } .main-nav { flex: 1 1 100%; flex-wrap: wrap; gap: 5px; margin-left: 0; } .main-nav a { font-size: .55rem; padding: 7px 8px; } .system-state { display: none; } .page-heading { align-items: flex-start; flex-direction: column; gap: 18px; } .team-badge, .event-state { min-width: 0; } .mission-grid { grid-template-columns: 1fr; } .mission-card { min-height: 240px; } .admin-overview { grid-template-columns: 1fr; } .admin-stat { min-height: 138px; } .site-footer { flex-direction: column; gap: 8px; } .game-action-row, .workbench-footer { align-items: flex-start; flex-direction: column; gap: 13px; } .workbench-footer { padding: 15px; } .cabinet-screen { min-height: 350px; padding: 25px 20px; } .cabinet-footer { flex-wrap: wrap; gap: 7px; } .cabinet-footer span:last-child { width: 100%; } th, td { padding-left: 12px; padding-right: 12px; } }

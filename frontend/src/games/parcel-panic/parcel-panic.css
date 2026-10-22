@@ -1,0 +1,32 @@
+.parcel-panic { --parcel-amber: #fbbf24; --parcel-rose: #fb7185; --parcel-mint: #6ee7b7; }
+.parcel-panic-board { background: #141417; border: 1px solid #3f3f46; border-radius: 8px; overflow: hidden; }
+.parcel-panic-status { align-items: center; background: #1f1f23; border-bottom: 1px solid #3f3f46; color: #a1a1aa; display: flex; font-family: "JetBrains Mono", monospace; font-size: .6rem; justify-content: space-between; letter-spacing: .03em; padding: 12px 16px; text-transform: uppercase; }
+.parcel-panic-status b { color: #fafafa; font-size: .8rem; }
+.parcel-panic-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr); }
+.parcel-panic-queue { border-right: 1px solid #3f3f46; padding: 18px; }
+.parcel-panic-depots { background: #101012; padding: 18px; }
+.parcel-panic-section-heading { align-items: baseline; color: #e4e4e7; display: flex; font-family: "JetBrains Mono", monospace; font-size: .65rem; justify-content: space-between; letter-spacing: .03em; margin-bottom: 13px; text-transform: uppercase; }
+.parcel-panic-section-heading small { color: #71717a; font-size: .52rem; }
+.parcel-panic-parcels { display: grid; gap: 9px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.parcel-panic-parcel { align-items: center; background: #09090b; border: 1px solid #3f3f46; border-radius: 6px; color: #e4e4e7; display: grid; font-size: .79rem; gap: 9px; grid-template-columns: auto 1fr; min-height: 56px; padding: 9px; text-align: left; transition: border-color .15s ease, background .15s ease, transform .15s ease; }
+.parcel-panic-parcel:not(:disabled):hover { border-color: #a1a1aa; transform: translateY(-1px); }
+.parcel-panic-parcel.is-selected { background: #27272a; border-color: #fafafa; box-shadow: 0 0 0 2px rgba(250,250,250,.08); }
+.parcel-panic-parcel.is-sorted { border-style: dashed; opacity: .5; }
+.parcel-panic-parcel small { color: var(--parcel-mint); font-family: "JetBrains Mono", monospace; font-size: .5rem; grid-column: 2; text-transform: uppercase; }
+.parcel-panic-stamp, .parcel-panic-depot-stamp { align-items: center; background: #27272a; border-radius: 4px; color: var(--parcel-amber); display: grid; font-family: Georgia, serif; font-size: 1.15rem; height: 33px; justify-content: center; width: 33px; }
+.parcel-panic-depot-list { display: grid; gap: 10px; }
+.parcel-panic-depot { align-items: center; background: #18181b; border: 1px solid #3f3f46; border-radius: 6px; color: #e4e4e7; display: grid; gap: 11px; grid-template-columns: auto 1fr auto; min-height: 67px; padding: 10px; text-align: left; transition: background .15s ease, border-color .15s ease; }
+.parcel-panic-depot:not(:disabled):hover { background: #27272a; border-color: #d4d4d8; }
+.parcel-panic-depot:disabled { opacity: .5; }
+.parcel-panic-depot:nth-child(2) .parcel-panic-depot-stamp { color: var(--parcel-rose); }
+.parcel-panic-depot:nth-child(3) .parcel-panic-depot-stamp { color: var(--parcel-mint); }
+.parcel-panic-depot strong, .parcel-panic-depot small { display: block; }
+.parcel-panic-depot strong { font-size: .83rem; margin-bottom: 3px; }
+.parcel-panic-depot small { color: #a1a1aa; font-size: .67rem; }
+.parcel-panic-console { align-items: center; border-top: 1px solid #3f3f46; display: flex; gap: 15px; justify-content: space-between; padding: 12px 16px; }
+.parcel-panic-console p { color: #a1a1aa; font-size: .78rem; line-height: 1.45; margin: 0; }
+.parcel-panic-hint { background: transparent; border: 1px solid #52525b; border-radius: 5px; color: #e4e4e7; flex: 0 0 auto; font-family: "JetBrains Mono", monospace; font-size: .57rem; padding: 8px 9px; text-transform: uppercase; }
+.parcel-panic-hint:not(:disabled):hover { background: #27272a; }
+.parcel-panic-hint span { color: var(--parcel-rose); margin-left: 5px; }
+@media (max-width: 680px) { .parcel-panic-layout { grid-template-columns: 1fr; } .parcel-panic-queue { border-bottom: 1px solid #3f3f46; border-right: 0; } .parcel-panic-console { align-items: flex-start; flex-direction: column; } }
+@media (max-width: 420px) { .parcel-panic-status { align-items: flex-start; flex-direction: column; gap: 5px; } .parcel-panic-parcels { grid-template-columns: 1fr; } }
