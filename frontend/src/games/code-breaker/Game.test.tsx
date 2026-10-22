@@ -4,46 +4,54 @@ import { game } from "./index";
 
 const mission = { id: "game-id", slug: "code-breaker", title: "Code Breaker", description: "", maxScore: 100, releaseState: "PUBLISHED" as const };
 const response = (body: unknown) => Promise.resolve({ ok: true, json: () => Promise.resolve(body) } as Response);
+const startRun = { round: 0, securedScore: 0, roundsCleared: 0, complete: false, attemptsRemaining: 6 };
 
 function enter(...symbols: string[]) {
   symbols.forEach((symbol) => fireEvent.click(screen.getByRole("button", { name: `Add ${symbol}` })));
   fireEvent.click(screen.getByRole("button", { name: /check sequence/i }));
 }
 
+async function ready() { await waitFor(() => expect(screen.getByRole("button", { name: "Add Comet" })).toBeEnabled()); }
 async function nextRound() {
   await waitFor(() => expect(screen.getByRole("button", { name: /open round/i })).toBeEnabled());
   fireEvent.click(screen.getByRole("button", { name: /open round/i }));
+  await ready();
 }
 
 beforeEach(() => { sessionStorage.setItem("teamToken", "team-token"); });
 afterEach(() => { cleanup(); sessionStorage.clear(); vi.unstubAllGlobals(); });
 
 describe("code-breaker game", () => {
-  it("reports the full score for cracking all three team codes on the first attempt", async () => {
+  it("reports the server-verified full score after cracking all three team codes", async () => {
     const fetchMock = vi.fn()
-      .mockReturnValueOnce(response({ exact: 3, shifted: 0, absent: 0, correct: true }))
-      .mockReturnValueOnce(response({ exact: 4, shifted: 0, absent: 0, correct: true }))
-      .mockReturnValueOnce(response({ exact: 5, shifted: 0, absent: 0, correct: true }));
+      .mockReturnValueOnce(response(startRun))
+      .mockReturnValueOnce(response({ exact: 3, shifted: 0, absent: 0, correct: true, roundCleared: true, roundFailed: false, complete: false, securedScore: 25, roundsCleared: 1, nextRound: 1, attemptsRemaining: 5 }))
+      .mockReturnValueOnce(response({ exact: 4, shifted: 0, absent: 0, correct: true, roundCleared: true, roundFailed: false, complete: false, securedScore: 57, roundsCleared: 2, nextRound: 2, attemptsRemaining: 4 }))
+      .mockReturnValueOnce(response({ exact: 5, shifted: 0, absent: 0, correct: true, roundCleared: true, roundFailed: false, complete: true, securedScore: 100, roundsCleared: 3, nextRound: 2, attemptsRemaining: 0 }));
     vi.stubGlobal("fetch", fetchMock);
     const onComplete = vi.fn();
     const Component = game.component;
     render(<Component mission={mission} onComplete={onComplete} />);
 
+    await ready();
     enter("Comet", "Orbit", "Spark"); await nextRound();
     enter("Spark", "Moon", "Orbit", "Cube"); await nextRound();
     enter("Moon", "Bolt", "Moon", "Leaf", "Orbit");
     await waitFor(() => expect(screen.getByText("Sequence cracked.")).toBeInTheDocument());
     fireEvent.click(screen.getByRole("button", { name: /dispatch result/i }));
 
-    expect(fetchMock).toHaveBeenCalledTimes(3);
-    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ score: 100, completed: true, details: expect.objectContaining({ roundsCleared: 3, guesses: 3, teamSpecificCodes: true }) }));
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ score: 100, completed: true, details: expect.objectContaining({ roundsCleared: 3, guesses: 3, teamSpecificCodes: true, serverVerified: true }) }));
   });
 
   it("shows exact, shifted, and absent feedback from the team puzzle endpoint", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockReturnValue(response({ exact: 1, shifted: 1, absent: 1, correct: false })));
+    vi.stubGlobal("fetch", vi.fn()
+      .mockReturnValueOnce(response(startRun))
+      .mockReturnValueOnce(response({ exact: 1, shifted: 1, absent: 1, correct: false, roundCleared: false, roundFailed: false, complete: false, securedScore: 0, roundsCleared: 0, nextRound: 0, attemptsRemaining: 5 })));
     const Component = game.component;
     render(<Component mission={mission} onComplete={vi.fn()} />);
 
+    await ready();
     enter("Comet", "Spark", "Leaf");
     await waitFor(() => expect(screen.getByText("1 exact")).toBeInTheDocument());
     expect(screen.getByText("1 shifted")).toBeInTheDocument();
@@ -51,20 +59,33 @@ describe("code-breaker game", () => {
   });
 
   it("shows a team-specific hint returned by the endpoint", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockReturnValue(response({ position: 0, symbol: "orbit" })));
+    vi.stubGlobal("fetch", vi.fn()
+      .mockReturnValueOnce(response(startRun))
+      .mockReturnValueOnce(response({ position: 0, symbol: "orbit" })));
     const Component = game.component;
     render(<Component mission={mission} onComplete={vi.fn()} />);
 
+    await ready();
     fireEvent.click(screen.getByRole("button", { name: /reveal position/i }));
     await waitFor(() => expect(screen.getByText("Position 1 is Orbit.")).toBeInTheDocument());
   });
 
-  it("continues after failed rounds and requires dispatch after round three", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockReturnValue(response({ exact: 0, shifted: 0, absent: 3, correct: false })));
+  it("advances after missed rounds and only enables final dispatch after round three", async () => {
+    const attemptsByRound = [0, 0, 0];
+    vi.stubGlobal("fetch", vi.fn().mockImplementation((url: string, options?: RequestInit) => {
+      if (url.endsWith("/runs")) return response(startRun);
+      const round = JSON.parse(String(options?.body)).round as number;
+      attemptsByRound[round] += 1;
+      const maximum = [6, 5, 4][round];
+      const roundFailed = attemptsByRound[round] === maximum;
+      const complete = round === 2 && roundFailed;
+      return response({ exact: 0, shifted: 0, absent: round + 3, correct: false, roundCleared: false, roundFailed, complete, securedScore: 0, roundsCleared: 0, nextRound: roundFailed && !complete ? round + 1 : round, attemptsRemaining: roundFailed ? (complete ? 0 : [5, 4][round]) : maximum - attemptsByRound[round] });
+    }));
     const onComplete = vi.fn();
     const Component = game.component;
     render(<Component mission={mission} onComplete={onComplete} />);
 
+    await ready();
     for (let attempt = 0; attempt < 6; attempt += 1) {
       enter("Leaf", "Leaf", "Leaf");
       await waitFor(() => expect(screen.getAllByText("0 exact")).toHaveLength(attempt + 1));
@@ -74,14 +95,13 @@ describe("code-breaker game", () => {
       enter("Leaf", "Leaf", "Leaf", "Leaf");
       await waitFor(() => expect(screen.getAllByText("0 exact")).toHaveLength(attempt + 1));
     }
-    await waitFor(() => expect(screen.getByRole("button", { name: /open round 3/i })).toBeEnabled());
-    fireEvent.click(screen.getByRole("button", { name: /open round 3/i }));
+    await nextRound();
     for (let attempt = 0; attempt < 4; attempt += 1) {
       enter("Leaf", "Leaf", "Leaf", "Leaf", "Leaf");
       await waitFor(() => expect(screen.getAllByText("0 exact")).toHaveLength(attempt + 1));
     }
     await waitFor(() => expect(screen.getByText("Run complete.")).toBeInTheDocument());
     fireEvent.click(screen.getByRole("button", { name: /dispatch result/i }));
-    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ score: 0, completed: true, details: expect.objectContaining({ roundsCleared: 0, guesses: 15 }) }));
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ score: 0, completed: true, details: expect.objectContaining({ roundsCleared: 0, guesses: 15, serverVerified: true }) }));
   });
 });

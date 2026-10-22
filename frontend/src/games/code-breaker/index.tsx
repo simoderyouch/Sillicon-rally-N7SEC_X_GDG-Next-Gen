@@ -1,11 +1,11 @@
-import { useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { Box, CircleDot, Leaf, Moon, Rocket, Sparkles, Waves, Zap, type LucideIcon } from "lucide-react";
 import type { GameDefinition, GameProps } from "../types";
 import { codeBreakerApi } from "./gameApi";
 import "./code-breaker.css";
 
 type SymbolId = "comet" | "orbit" | "spark" | "leaf" | "wave" | "cube" | "moon" | "bolt";
-type Phase = "building" | "between-rounds" | "complete";
+type Phase = "loading" | "building" | "between-rounds" | "complete";
 type GuessRecord = { symbols: SymbolId[]; exact: number; shifted: number; absent: number };
 
 const symbols: { id: SymbolId; name: string; icon: LucideIcon }[] = [
@@ -26,7 +26,7 @@ function SymbolGlyph({ id }: { id: SymbolId }) { const Icon = symbolFor(id)?.ico
 
 function CodeBreaker({ mission, onComplete, disabled = false }: GameProps) {
   const [round, setRound] = useState(0);
-  const [phase, setPhase] = useState<Phase>("building");
+  const [phase, setPhase] = useState<Phase>("loading");
   const [draft, setDraft] = useState<SymbolId[]>([]);
   const [history, setHistory] = useState<GuessRecord[]>([]);
   const [earnedScore, setEarnedScore] = useState(0);
@@ -37,10 +37,22 @@ function CodeBreaker({ mission, onComplete, disabled = false }: GameProps) {
   const [isChecking, setIsChecking] = useState(false);
   const [requestError, setRequestError] = useState<string | null>(null);
   const [finished, setFinished] = useState(false);
+  const [attemptsRemaining, setAttemptsRemaining] = useState(rounds[0].attempts);
 
   const currentRound = rounds[round];
-  const triesLeft = currentRound.attempts - history.length;
+  const triesLeft = attemptsRemaining;
   const token = sessionStorage.getItem("teamToken");
+
+  useEffect(() => {
+    if (!token) { setRequestError("Join a team before opening this challenge."); return; }
+    codeBreakerApi.start(token).then((run) => {
+      setRound(run.round);
+      setEarnedScore(run.securedScore);
+      setRoundsCleared(run.roundsCleared);
+      setAttemptsRemaining(run.attemptsRemaining);
+      setPhase(run.complete ? "complete" : "building");
+    }).catch((error) => setRequestError(error instanceof Error ? error.message : "Code Breaker could not start."));
+  }, [token]);
 
   function addSymbol(symbol: SymbolId) {
     if (phase !== "building" || disabled || isChecking || finished || draft.length >= currentRound.slots) return;
@@ -69,14 +81,13 @@ function CodeBreaker({ mission, onComplete, disabled = false }: GameProps) {
       setTotalGuesses((value) => value + 1);
       setDraft([]);
 
-      if (feedback.correct) {
-        const roundScore = Math.max(1, currentRound.maxPoints - (history.length * currentRound.penalty) - (hint ? currentRound.hintPenalty : 0));
-        setEarnedScore((value) => value + roundScore);
-        setRoundsCleared((value) => value + 1);
-        setPhase(round === rounds.length - 1 ? "complete" : "between-rounds");
-      } else if (nextHistory.length === currentRound.attempts) {
-        setRoundMissed(true);
-        setPhase(round === rounds.length - 1 ? "complete" : "between-rounds");
+      setEarnedScore(feedback.securedScore);
+      setRoundsCleared(feedback.roundsCleared);
+      setAttemptsRemaining(feedback.attemptsRemaining);
+      if (feedback.roundCleared || feedback.roundFailed) {
+        setRoundMissed(feedback.roundFailed);
+        setRound(feedback.nextRound);
+        setPhase(feedback.complete ? "complete" : "between-rounds");
       }
     } catch (error) {
       setRequestError(error instanceof Error ? error.message : "Code Breaker could not verify that sequence.");
@@ -103,36 +114,23 @@ function CodeBreaker({ mission, onComplete, disabled = false }: GameProps) {
 
   function nextRound() {
     if (phase !== "between-rounds" || disabled || isChecking || finished) return;
-    setRound((value) => value + 1);
     setHistory([]);
     setDraft([]);
     setHint(null);
     setRoundMissed(false);
     setRequestError(null);
     setPhase("building");
-  }
-
-  function restart() {
-    if (disabled || isChecking || finished) return;
-    setRound(0);
-    setPhase("building");
-    setDraft([]);
-    setHistory([]);
-    setEarnedScore(0);
-    setRoundsCleared(0);
-    setRoundMissed(false);
-    setTotalGuesses(0);
-    setHint(null);
-    setRequestError(null);
   }
 
   function finish() {
     if (phase !== "complete" || disabled || finished) return;
     setFinished(true);
-    onComplete({ score: Math.min(earnedScore, mission.maxScore), completed: true, details: { roundsCleared, guesses: totalGuesses, teamSpecificCodes: true } });
+    onComplete({ score: Math.min(earnedScore, mission.maxScore), completed: true, details: { roundsCleared, guesses: totalGuesses, teamSpecificCodes: true, serverVerified: true } });
   }
 
-  const message = phase === "complete"
+  const message = phase === "loading"
+      ? { kicker: "Preparing team run", title: "Locking your attempt budget.", body: "Your three-round competition run is being restored." }
+      : phase === "complete"
       ? roundsCleared < rounds.length
         ? { kicker: "All three rounds attempted", title: "Run complete.", body: `The final code stayed locked. ${earnedScore} points are secured—dispatch the result to record your team score.` }
         : { kicker: "All three codes solved", title: "Sequence cracked.", body: `${earnedScore} points secured. Dispatch the result to record your team score.` }
@@ -144,7 +142,7 @@ function CodeBreaker({ mission, onComplete, disabled = false }: GameProps) {
 
   return (
     <section className="game-shell code-breaker">
-      <div className="game-briefing"><p className="eyebrow">Challenge code-breaker · deduction console</p><h1>{mission.title}</h1><p className="lede">Each team receives its own hidden codes. Place a sequence, inspect the clues, and crack all three before attempts run out.</p></div>
+      <div className="game-briefing"><p className="eyebrow">Challenge code-breaker · deduction console</p><h1>{mission.title}</h1><p className="lede">Each team gets one server-verified three-round run. Place a sequence, inspect the clues, and crack all three before attempts run out.</p></div>
       <div className="code-breaker-board">
         <div className="code-breaker-topline"><span>Round <b>{Math.min(round + 1, rounds.length)}</b> / {rounds.length}<small>{currentRound.label} · {currentRound.slots} slots</small></span><span>Secured <b>{earnedScore}</b> / {mission.maxScore} pts<small>{currentRound.maxPoints} pts maximum this round</small></span></div>
         <div className={`code-breaker-message is-${phase}`} aria-live="polite"><span>{message.kicker}</span><strong>{message.title}</strong><p>{message.body}</p></div>
@@ -165,7 +163,7 @@ function CodeBreaker({ mission, onComplete, disabled = false }: GameProps) {
         {history.length > 0 && <div className="code-breaker-history"><div className="history-heading"><span>Attempt log</span><small>Exact = right symbol, right slot · Shifted = right symbol, different slot</small></div>{history.map((guess, index) => <div className="guess-row" key={`${round}-${index}`}><span className="guess-number">{String(index + 1).padStart(2, "0")}</span><div className="guess-symbols">{guess.symbols.map((symbol, position) => <span className={`guess-token code-symbol-${symbol}`} key={`${symbol}-${position}`} aria-label={symbolFor(symbol)?.name}><SymbolGlyph id={symbol} /></span>)}</div><div className="guess-feedback"><span className="feedback-exact">{guess.exact} exact</span><span className="feedback-shifted">{guess.shifted} shifted</span><span className="feedback-absent">{guess.absent} absent</span></div></div>)}</div>}
         {phase === "between-rounds" && <button type="button" className="code-breaker-next" onClick={nextRound} disabled={disabled || isChecking || finished}>Open round {round + 2} <span aria-hidden="true">→</span></button>}
       </div>
-      <div className="game-action-row"><span>{phase === "complete" ? "All three rounds are finished. Dispatch the final score to finish this run." : "Play every round to unlock dispatch."}</span><button className="button-primary" onClick={finish} disabled={phase !== "complete" || disabled || finished}>{finished ? "Result recorded" : "Dispatch result"} <span aria-hidden="true">→</span></button></div>
+      <div className="game-action-row"><span>{phase === "complete" ? "All three rounds are finished. Dispatch the server-verified final score to finish this run." : "Play every round to unlock dispatch."}</span><button className="button-primary" onClick={finish} disabled={phase !== "complete" || disabled || finished}>{finished ? "Result recorded" : "Dispatch result"} <span aria-hidden="true">→</span></button></div>
     </section>
   );
 }

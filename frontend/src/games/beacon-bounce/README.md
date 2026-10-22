@@ -2,7 +2,7 @@
 
 ## Game plan
 
-Beacon Bounce is a non-security visual-memory game. A team watches a route travel through nine named beacons, then repeats the same order. It is a six-round knockout: one wrong beacon ends the run, returns the team to round 1, and submits no score.
+Beacon Bounce is a non-security visual-memory game. A team watches a route travel through nine named beacons, then repeats the same order. It is a six-round knockout: one wrong beacon ends the run. Secured points remain available to dispatch, but the run cannot be replayed.
 
 The round structure makes the game social: one person can watch, another can repeat the names, and a third can tap the beacons. The interface uses names and symbols alongside colour, so the puzzle is not colour-only.
 
@@ -21,16 +21,16 @@ Each cleared route permanently secures its listed points. The six values total t
 
 Rounds 1–3 teach the rhythm. Round 4 is the hard-mode breakpoint: routes become longer and the beacon pace drops sharply. Rounds 5 and 6 require teams to remember seven and then all nine beacons under faster playback.
 
-## Hints
+## Competition integrity
 
-The **Need a hand?** card clearly states the next available hint. Each round permits two free assists: replay the route and pin its first two stops. These never clear a round and never reduce its route value.
+Starting the game creates one random six-route run in Redis for the authenticated team. Refreshing or reopening the page restores that same run; it does not generate another route or reset the score. Every beacon selection is validated against the stored route by the private backend endpoint. After a wrong selection, the only available action is dispatching the points secured before the failure.
 
-The final shared callback is made only after all six routes are cleared. It contains the earned score and total hints used.
+When the platform receives that dispatch, it compares the submitted points and completion state with the terminal Redis run. A forged or early browser score is rejected.
 
 ## Test coverage
 
-`Game.test.tsx` verifies a perfect six-round run reports the mission maximum and that a wrong beacon ends the run without submitting a score.
+`Game.test.tsx` verifies server-started routes, backend-verified beacon attempts, and the dispatch-only state after a failure. `BeaconBounceRunServiceTest` verifies random route shape, persistent team state, and terminal failures.
 
 ## Scope
 
-This is a frontend-only game. It uses no private game endpoint and never calls the shared scoring API itself.
+The game uses private Beacon Bounce endpoints only. It never calls the shared scoring API itself; the platform runner dispatches the final result after the game reports its server-verified outcome.

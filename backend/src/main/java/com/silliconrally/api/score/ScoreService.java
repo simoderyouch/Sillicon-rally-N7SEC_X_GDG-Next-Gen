@@ -1,6 +1,7 @@
 package com.silliconrally.api.score;
 
 import com.silliconrally.api.event.EventStateService;
+import com.silliconrally.api.games.CompetitionScoreVerifier;
 import com.silliconrally.api.mission.*;
 import com.silliconrally.api.team.*;
 import java.util.*;
@@ -13,8 +14,8 @@ import static org.springframework.http.HttpStatus.*;
 @Service
 @Transactional
 public class ScoreService {
-  private final SessionTokenService tokens; private final TeamRepository teams; private final MissionRepository missions; private final GameScoreRepository scores; private final EventStateService event; private final ApplicationEventPublisher events;
-  public ScoreService(SessionTokenService tokens, TeamRepository teams, MissionRepository missions, GameScoreRepository scores, EventStateService event, ApplicationEventPublisher events) { this.tokens = tokens; this.teams = teams; this.missions = missions; this.scores = scores; this.event = event; this.events = events; }
+  private final SessionTokenService tokens; private final TeamRepository teams; private final MissionRepository missions; private final GameScoreRepository scores; private final EventStateService event; private final ApplicationEventPublisher events; private final CompetitionScoreVerifier competitionScores;
+  public ScoreService(SessionTokenService tokens, TeamRepository teams, MissionRepository missions, GameScoreRepository scores, EventStateService event, ApplicationEventPublisher events, CompetitionScoreVerifier competitionScores) { this.tokens = tokens; this.teams = teams; this.missions = missions; this.scores = scores; this.event = event; this.events = events; this.competitionScores = competitionScores; }
 
   public ScoreDtos.ScoreResponse submit(String teamToken, String slug, ScoreDtos.SubmitScoreRequest request) {
     if (!event.get().isOpen()) throw new ResponseStatusException(FORBIDDEN, "The event is not open");
@@ -22,6 +23,7 @@ public class ScoreService {
     Team team = teams.findById(tokens.requireTeam(teamToken)).orElseThrow(() -> new ResponseStatusException(UNAUTHORIZED, "Team session is no longer valid"));
     if (team.getStatus() != TeamStatus.ACTIVE) throw new ResponseStatusException(FORBIDDEN, "This team is inactive");
     Mission mission = missions.findBySlug(slug).filter(item -> item.getReleaseState() == MissionReleaseState.PUBLISHED).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Published mission not found"));
+    competitionScores.verify(team.getId(), slug, request);
     if (request.score() > mission.getMaxScore()) throw new ResponseStatusException(BAD_REQUEST, "Score exceeds this mission maximum");
     GameScore saved = scores.findByTeamAndMission(team, mission).map(existing -> updateIfImproved(existing, request)).orElseGet(() -> scores.save(new GameScore(team, mission, request.score(), request.completed())));
     events.publishEvent(new LeaderboardUpdatedEvent(leaderboard()));

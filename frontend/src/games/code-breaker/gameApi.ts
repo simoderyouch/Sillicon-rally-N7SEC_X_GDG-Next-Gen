@@ -1,6 +1,7 @@
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.DEV ? "http://localhost:8080" : "");
 
-export type GuessFeedback = { exact: number; shifted: number; absent: number; correct: boolean };
+export type CodeBreakerRun = { round: number; securedScore: number; roundsCleared: number; complete: boolean; attemptsRemaining: number };
+export type GuessFeedback = { exact: number; shifted: number; absent: number; correct: boolean; roundCleared: boolean; roundFailed: boolean; complete: boolean; securedScore: number; roundsCleared: number; nextRound: number; attemptsRemaining: number };
 export type Hint = { position: number; symbol: string };
 
 async function request<T>(path: string, token: string, init: RequestInit = {}): Promise<T> {
@@ -16,6 +17,7 @@ async function request<T>(path: string, token: string, init: RequestInit = {}): 
 }
 
 export const codeBreakerApi = {
+  start: (token: string) => request<CodeBreakerRun>("/api/v1/games/code-breaker/runs", token, { method: "POST" }),
   check: (token: string, round: number, symbols: string[]) => request<GuessFeedback>("/api/v1/games/code-breaker/attempt", token, { method: "POST", body: JSON.stringify({ round, symbols }) }),
-  hint: (token: string, round: number, position: number) => request<Hint>(`/api/v1/games/code-breaker/hint?round=${round}&position=${position}`, token),
+  hint: (token: string, round: number, position: number) => request<Hint>(`/api/v1/games/code-breaker/hint?round=${round}&position=${position}`, token, { method: "POST" }),
 };
