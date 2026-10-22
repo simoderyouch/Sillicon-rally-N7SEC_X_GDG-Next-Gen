@@ -34,7 +34,7 @@ export default function App() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
       </div>
-      <footer className="site-footer"><span>N7SEC · authorised training environment</span><span>Observe. Verify. Defend.</span></footer>
+      <footer className="site-footer"><span>Authorised training environment</span><span>Observe. Verify. Defend.</span></footer>
     </main>
   );
 }

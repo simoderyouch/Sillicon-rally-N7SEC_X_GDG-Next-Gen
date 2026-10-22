@@ -101,13 +101,13 @@ function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
   }
 
   function finish() {
-    if (phase !== "complete" || disabled || finished) return;
+    if ((phase !== "complete" && phase !== "failed") || disabled || finished) return;
     setFinished(true);
-    onComplete({ score: earnedScore, completed: true, details: { roundsCleared: rounds.length, hintsUsed: totalHintsUsed, incorrectSequences: 0 } });
+    onComplete({ score: earnedScore, completed: phase === "complete", details: { roundsCleared: phase === "complete" ? rounds.length : round, hintsUsed: totalHintsUsed, incorrectSequences: phase === "failed" ? 1 : 0 } });
   }
 
   const roundMessage = phase === "failed"
-    ? { eyebrow: `Round ${round + 1} ended the run`, title: "Run over.", body: "A beacon was out of order. No points were submitted—start again from round 1." }
+    ? { eyebrow: `Round ${round + 1} ended the run`, title: "Route ended.", body: `${earnedScore} points are secured. Dispatch the result to record them, or start again to attempt all six routes.` }
     : phase === "complete"
       ? { eyebrow: "All six routes cleared", title: "Parade complete.", body: `${earnedScore} points secured. Dispatch the result to record your team score.` }
       : phase === "showing"
@@ -131,7 +131,7 @@ function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
         </div>
         {phase !== "failed" && phase !== "complete" && <div className="beacon-bounce-console"><div className="beacon-bounce-help"><span>Need a hand?</span><small>{nextHint ?? "Both hints have been used this round."}</small><button type="button" className="beacon-bounce-hint" disabled={!nextHint || phase !== "input" || disabled || finished} onClick={useHint}>{nextHint ? `Reveal hint ${hintsUsed + 1}` : "Hints used"}<b>{nextHint ? "No point penalty" : "Round limit reached"}</b></button></div></div>}
       </div>
-      <div className="game-action-row"><span>{phase === "complete" ? "All six routes are complete." : phase === "failed" ? "This run has ended. Start again to try the six-route course." : "Clear every route in order to unlock dispatch."}</span><button className="button-primary" disabled={phase !== "complete" || disabled || finished} onClick={finish}>{finished ? "Result recorded" : "Dispatch result"} <span aria-hidden="true">→</span></button></div>
+      <div className="game-action-row"><span>{phase === "complete" ? "All six routes are complete." : phase === "failed" ? `${earnedScore} secured points must be dispatched to finish this run.` : "Clear every route in order to unlock dispatch."}</span><button className="button-primary" disabled={(phase !== "complete" && phase !== "failed") || disabled || finished} onClick={finish}>{finished ? "Result recorded" : "Dispatch result"} <span aria-hidden="true">→</span></button></div>
     </section>
   );
 }

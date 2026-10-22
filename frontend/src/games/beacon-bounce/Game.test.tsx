@@ -34,17 +34,16 @@ describe("beacon-bounce game", () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ score: 100, completed: true, details: expect.objectContaining({ roundsCleared: 6, hintsUsed: 0, incorrectSequences: 0 }) }));
   });
 
-  it("ends the run immediately after a wrong beacon without submitting a score", () => {
+  it("requires dispatching banked points after a wrong beacon", () => {
     vi.useFakeTimers();
     const onComplete = vi.fn();
     const Component = game.component;
     render(<Component mission={mission} onComplete={onComplete} />);
-    revealRoute();
-    tap("Rose");
-    expect(screen.getByText("Run over.")).toBeInTheDocument();
-    expect(screen.getByText(/no points were submitted/i)).toBeInTheDocument();
-    expect(onComplete).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: /start again/i }));
-    expect(screen.getByText("Ready for the first route.")).toBeInTheDocument();
+    revealRoute(); tap("Sun", "Rose", "Mint");
+    revealRoute(); tap("Sun");
+    expect(screen.getByText("Route ended.")).toBeInTheDocument();
+    expect(screen.getByText(/8 points are secured/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /dispatch result/i }));
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ score: 8, completed: false, details: expect.objectContaining({ roundsCleared: 1, incorrectSequences: 1 }) }));
   });
 });

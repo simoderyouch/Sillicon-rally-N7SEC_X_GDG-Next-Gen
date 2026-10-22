@@ -59,7 +59,7 @@ describe("code-breaker game", () => {
     await waitFor(() => expect(screen.getByText("Position 1 is Orbit.")).toBeInTheDocument());
   });
 
-  it("ends the run after the final failed attempt without submitting a score", async () => {
+  it("continues after failed rounds and requires dispatch after round three", async () => {
     vi.stubGlobal("fetch", vi.fn().mockReturnValue(response({ exact: 0, shifted: 0, absent: 3, correct: false })));
     const onComplete = vi.fn();
     const Component = game.component;
@@ -69,9 +69,19 @@ describe("code-breaker game", () => {
       enter("Leaf", "Leaf", "Leaf");
       await waitFor(() => expect(screen.getAllByText("0 exact")).toHaveLength(attempt + 1));
     }
-
-    expect(screen.getByText("Run over.")).toBeInTheDocument();
-    expect(screen.getByText(/not submitted/i)).toBeInTheDocument();
-    expect(onComplete).not.toHaveBeenCalled();
+    await nextRound();
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      enter("Leaf", "Leaf", "Leaf", "Leaf");
+      await waitFor(() => expect(screen.getAllByText("0 exact")).toHaveLength(attempt + 1));
+    }
+    await waitFor(() => expect(screen.getByRole("button", { name: /open round 3/i })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: /open round 3/i }));
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      enter("Leaf", "Leaf", "Leaf", "Leaf", "Leaf");
+      await waitFor(() => expect(screen.getAllByText("0 exact")).toHaveLength(attempt + 1));
+    }
+    await waitFor(() => expect(screen.getByText("Run complete.")).toBeInTheDocument());
+    fireEvent.click(screen.getByRole("button", { name: /dispatch result/i }));
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ score: 0, completed: true, details: expect.objectContaining({ roundsCleared: 0, guesses: 15 }) }));
   });
 });
