@@ -2,11 +2,13 @@
 
 ## Game plan
 
-Beacon Bounce is an easy, non-security visual-memory game. A team watches a route travel through six named beacons, then repeats the same order. The three rounds contain three, four, and five stops.
+Beacon Bounce is an easy, non-security visual-memory game. A team watches a route travel through nine named beacons, then repeats the same order. The three rounds contain three, four, and five stops, and the playback accelerates from steady to quick to fast.
 
 The round structure makes the game social: one person can watch, another can repeat the names, and a third can tap the beacons. The interface uses names and symbols alongside colour, so the puzzle is not colour-only.
 
 ## Hints and scoring
+
+The **Need a hand?** card states the next available hint and its exact score cost before the team uses it:
 
 1. Replay the route — 10% total score deduction.
 2. Pin the first two route stops below the board — 20% total score deduction.

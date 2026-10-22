@@ -8,7 +8,7 @@ import { game } from "./index";
 const mission = { id: "game-id", slug: "beacon-bounce", title: "Beacon Bounce", description: "", maxScore: 100, releaseState: "PUBLISHED" as const };
 
 function revealRoute() {
-  fireEvent.click(screen.getByRole("button", { name: /show (next )?route/i }));
+  fireEvent.click(screen.getByRole("button", { name: /(show the route|start next route)/i }));
   act(() => vi.runAllTimers());
 }
 
@@ -25,8 +25,8 @@ describe("beacon-bounce game", () => {
     const Component = game.component;
     render(<Component mission={mission} onComplete={onComplete} />);
     revealRoute(); tap("Sun", "Rose", "Mint");
-    revealRoute(); tap("Violet", "Ember", "Sun", "Pearl");
-    revealRoute(); tap("Mint", "Rose", "Violet", "Ember", "Sun");
+    revealRoute(); tap("Violet", "Ember", "Lime", "Pearl");
+    revealRoute(); tap("Mint", "Rose", "Plum", "Ember", "Apricot");
     fireEvent.click(screen.getByRole("button", { name: /dispatch result/i }));
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ score: 100, completed: true, details: expect.objectContaining({ hintsUsed: 0, incorrectSequences: 0 }) }));
   });
@@ -34,7 +34,7 @@ describe("beacon-bounce game", () => {
   it("deducts score when a hint is used", () => {
     const Component = game.component;
     render(<Component mission={mission} onComplete={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: /use hint 1/i }));
+    fireEvent.click(screen.getByRole("button", { name: /reveal hint 1/i }));
     expect(screen.getByText(/the route will play again/i)).toBeInTheDocument();
     expect(screen.getByText(/projected score/i).parentElement).toHaveTextContent("90 pts");
   });

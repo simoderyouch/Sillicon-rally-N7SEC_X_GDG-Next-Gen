@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import type { GameDefinition, GameProps } from "../types";
 import "./beacon-bounce.css";
 
-type BeaconId = "sun" | "rose" | "mint" | "violet" | "ember" | "pearl";
+type BeaconId = "sun" | "rose" | "mint" | "violet" | "ember" | "pearl" | "lime" | "plum" | "apricot";
 type Phase = "ready" | "showing" | "input" | "complete";
 
 const beacons: { id: BeaconId; name: string; glyph: string }[] = [
@@ -12,19 +12,27 @@ const beacons: { id: BeaconId; name: string; glyph: string }[] = [
   { id: "violet", name: "Violet", glyph: "✳" },
   { id: "ember", name: "Ember", glyph: "▲" },
   { id: "pearl", name: "Pearl", glyph: "○" },
+  { id: "lime", name: "Lime", glyph: "✚" },
+  { id: "plum", name: "Plum", glyph: "⬟" },
+  { id: "apricot", name: "Apricot", glyph: "✶" },
 ];
 
 const routes: BeaconId[][] = [
   ["sun", "rose", "mint"],
-  ["violet", "ember", "sun", "pearl"],
-  ["mint", "rose", "violet", "ember", "sun"],
+  ["violet", "ember", "lime", "pearl"],
+  ["mint", "rose", "plum", "ember", "apricot"],
 ];
+
+const routePaces = [700, 520, 360];
+const tempoLabels = ["Steady tempo", "Quick tempo", "Fast tempo"];
 
 const hintMessages = [
   "The route will play again. Watch for the beacon order, not the colour pattern.",
   "The first two stops are now pinned beneath the route board.",
   "This round was cleared for you. One final route remains.",
 ];
+
+const hintActions = ["Replay this route", "Pin the first two stops", "Clear this round"];
 
 function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
   const [round, setRound] = useState(0);
@@ -37,6 +45,7 @@ function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
   const [finished, setFinished] = useState(false);
 
   const route = routes[round];
+  const nextHint = hintsUsed < hintActions.length ? hintActions[hintsUsed] : null;
   const projectedScore = useMemo(() => Math.max(0, Math.round(mission.maxScore * (1 - ([0, 0.1, 0.2, 0.3][hintsUsed] ?? 0.3)))), [hintsUsed, mission.maxScore]);
 
   function showRoute() {
@@ -44,11 +53,13 @@ function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
     setAttempt([]);
     setPhase("showing");
     setNotice("Watch the beacons. The route will fade before your turn.");
+    const pulseDelay = routePaces[round];
+    const pulseDuration = Math.max(210, Math.round(pulseDelay * 0.65));
     route.forEach((beaconId, index) => {
-      window.setTimeout(() => setActiveBeacon(beaconId), index * 700);
-      window.setTimeout(() => setActiveBeacon(null), index * 700 + 470);
+      window.setTimeout(() => setActiveBeacon(beaconId), index * pulseDelay);
+      window.setTimeout(() => setActiveBeacon(null), index * pulseDelay + pulseDuration);
     });
-    window.setTimeout(() => { setActiveBeacon(null); setPhase("input"); setNotice("Your turn. Repeat the route one beacon at a time."); }, route.length * 700);
+    window.setTimeout(() => { setActiveBeacon(null); setPhase("input"); setNotice("Your turn. Repeat the route one beacon at a time."); }, route.length * pulseDelay);
   }
 
   function chooseBeacon(beaconId: BeaconId) {
@@ -110,15 +121,16 @@ function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
     <section className="game-shell beacon-bounce">
       <div className="game-briefing"><p className="eyebrow">Challenge beacon-bounce · light parade</p><h1>{mission.title}</h1><p className="lede">Watch the glowing route, remember the order, and guide the beacon parade home.</p></div>
       <div className="beacon-bounce-board">
-        <div className="beacon-bounce-topline"><span>Round <b>{Math.min(round + 1, routes.length)}</b> / {routes.length}</span><span>Projected score <b>{projectedScore}</b> pts</span></div>
+        <div className="beacon-bounce-topline"><span>Round <b>{Math.min(round + 1, routes.length)}</b> / {routes.length}<small>{tempoLabels[round]}</small></span><span>Projected score <b>{projectedScore}</b> pts</span></div>
         <div className="beacon-bounce-stage">
           <div className="beacon-bounce-route" aria-live="polite"><span>Route status</span><strong>{phase === "showing" ? "Watching the glow" : phase === "input" ? `${attempt.length} / ${route.length} repeated` : phase === "complete" ? "Parade complete" : "Ready when you are"}</strong></div>
           <div className="beacon-bounce-grid" aria-label="Beacon route board">
             {beacons.map((beacon) => <button key={beacon.id} type="button" className={`beacon beacon-${beacon.id} ${activeBeacon === beacon.id ? "is-lit" : ""} ${attempt.includes(beacon.id) && phase === "input" ? "is-picked" : ""}`} aria-label={`Beacon ${beacon.name}`} disabled={phase !== "input" || disabled || finished} onClick={() => chooseBeacon(beacon.id)}><span aria-hidden="true">{beacon.glyph}</span><small>{beacon.name}</small></button>)}
           </div>
           {hintsUsed >= 2 && phase !== "complete" && <p className="beacon-bounce-pinned">Pinned start: {route.slice(0, 2).map((id) => beacons.find((beacon) => beacon.id === id)?.name).join(" → ")}</p>}
+          <button type="button" className="beacon-bounce-show" disabled={phase !== "ready" || disabled || finished} onClick={showRoute}>{round === 0 ? "Show the route" : "Start next route"} <span aria-hidden="true">↗</span><small>{round === 0 ? "Watch once, then repeat the glow" : `${tempoLabels[round]} · ${route.length} stops`}</small></button>
         </div>
-        <div className="beacon-bounce-console" aria-live="polite"><p>{notice}</p><div><button type="button" className="beacon-bounce-hint" disabled={hintsUsed >= hintMessages.length || phase === "complete" || disabled || finished} onClick={useHint}>{hintsUsed >= hintMessages.length ? "All hints used" : `Use hint ${hintsUsed + 1}`} <span>−{hintsUsed === 0 ? "10" : hintsUsed === 1 ? "20" : "30"}%</span></button><button type="button" className="beacon-bounce-show" disabled={phase !== "ready" || disabled || finished} onClick={showRoute}>{round === 0 ? "Show route" : "Show next route"} <span aria-hidden="true">↗</span></button></div></div>
+        <div className="beacon-bounce-console" aria-live="polite"><p>{notice}</p><div className="beacon-bounce-help"><span>Need a hand?</span><small>{nextHint ?? "Every hint has been used."}</small><button type="button" className="beacon-bounce-hint" disabled={!nextHint || phase === "complete" || disabled || finished} onClick={useHint}>{nextHint ? `Reveal hint ${hintsUsed + 1}` : "Hints used"} <b>{hintsUsed === 0 ? "−10%" : hintsUsed === 1 ? "−20%" : "−30%"}</b></button></div></div>
       </div>
       <div className="game-action-row"><span>{phase === "complete" ? "All three routes are complete." : "Complete all three routes to unlock dispatch."}</span><button className="button-primary" disabled={phase !== "complete" || disabled || finished} onClick={finish}>{finished ? "Result recorded" : "Dispatch result"} <span aria-hidden="true">→</span></button></div>
     </section>
