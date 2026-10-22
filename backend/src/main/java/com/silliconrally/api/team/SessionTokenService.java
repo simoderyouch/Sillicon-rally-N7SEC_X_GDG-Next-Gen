@@ -25,6 +25,7 @@ public class SessionTokenService {
     throw new ResponseStatusException(UNAUTHORIZED, "A team session is required");
   }
   public void revokeTeam(String token) { if (token != null) redis.delete(TEAM_PREFIX + token); }
+  public void revokeAllTeamSessions() { var keys = redis.keys(TEAM_PREFIX + "*"); if (keys != null && !keys.isEmpty()) redis.delete(keys); }
   public String issueAdminToken(String email) { String token = UUID.randomUUID().toString(); redis.opsForValue().set(ADMIN_PREFIX + token, email, ttl); return token; }
   public String requireAdmin(String token) { String email = token == null ? null : redis.opsForValue().get(ADMIN_PREFIX + token); if (email == null) throw new ResponseStatusException(UNAUTHORIZED, "An admin session is required"); return email; }
 }

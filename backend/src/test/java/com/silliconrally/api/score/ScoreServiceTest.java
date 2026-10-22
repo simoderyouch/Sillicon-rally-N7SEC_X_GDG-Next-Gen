@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
 import com.silliconrally.api.event.EventStateService;
+import com.silliconrally.api.games.CompetitionScoreVerifier;
 import com.silliconrally.api.mission.MissionRepository;
 import com.silliconrally.api.team.SessionTokenService;
 import com.silliconrally.api.team.TeamRepository;
@@ -22,7 +23,8 @@ class ScoreServiceTest {
         org.mockito.Mockito.mock(MissionRepository.class),
         scores,
         org.mockito.Mockito.mock(EventStateService.class),
-        events);
+        events,
+        org.mockito.Mockito.mock(CompetitionScoreVerifier.class));
 
     service.resetLeaderboard();
 

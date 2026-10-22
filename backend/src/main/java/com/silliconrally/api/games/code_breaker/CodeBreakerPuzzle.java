@@ -11,7 +11,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 /** Stateless, deterministic team puzzle generator. No answer is sent to the browser. */
 public final class CodeBreakerPuzzle {
   private static final List<String> SYMBOLS = List.of("comet", "orbit", "spark", "leaf", "wave", "cube", "moon", "bolt");
-  private static final int[] LENGTHS = {3, 4, 5};
+  private static final int[] LENGTHS = {3, 3, 5};
 
   public record Feedback(int exact, int shifted, int absent) { }
 

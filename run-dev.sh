@@ -36,7 +36,7 @@ set +a
 : "${POSTGRES_USER:=sillicon}"
 : "${POSTGRES_PASSWORD:=change-me}"
 : "${ADMIN_EMAIL:=admin@sillicon-rally.local}"
-: "${ADMIN_PASSWORD:=change-me-before-an-event}"
+: "${ADMIN_PASSWORD:=admin-gdg}"
 
 docker compose --env-file .env up -d postgres
 

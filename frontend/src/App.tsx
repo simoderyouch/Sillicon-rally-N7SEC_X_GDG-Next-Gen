@@ -1,4 +1,5 @@
 import { Link, NavLink, Navigate, Route, Routes } from "react-router-dom";
+import { Radio, ShieldCheck, Sparkles, Trophy } from "lucide-react";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminLogin } from "./pages/AdminLogin";
 import { GameList } from "./pages/GameList";
@@ -11,15 +12,15 @@ export default function App() {
     <main className="app-shell">
       <header className="site-header">
         <Link to="/" className="brand" aria-label="Sillicon Rally challenge home">
-          <span className="brand-mark" aria-hidden="true">N7</span>
+          <span className="brand-mark" aria-hidden="true"><Sparkles size={18} strokeWidth={2.4} /></span>
           <span><strong>Sillicon Rally</strong><em>Challenge Grid</em></span>
         </Link>
         <nav className="main-nav" aria-label="Main navigation">
-          <NavLink to="/play">Join challenge</NavLink>
-          <NavLink to="/leaderboard">Scoreboard</NavLink>
-          <NavLink to="/admin">Admin shell</NavLink>
+          <NavLink to="/play"><Sparkles size={14} /> Join challenge</NavLink>
+          <NavLink to="/leaderboard"><Trophy size={14} /> Scoreboard</NavLink>
+          <NavLink to="/admin"><ShieldCheck size={14} /> Admin shell</NavLink>
         </nav>
-        <span className="system-state"><i />Challenge mode</span>
+        <span className="system-state"><Radio size={13} /> Live challenge</span>
       </header>
       <div className="route-line" aria-hidden="true"><i /><i /><i /><i /></div>
       <div className="page-content">
@@ -33,7 +34,7 @@ export default function App() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
       </div>
-      <footer className="site-footer"><span>N7SEC · authorised training environment</span><span>Observe. Verify. Defend.</span></footer>
+      <footer className="site-footer"><span>Authorised training environment</span><span>Observe. Verify. Defend.</span></footer>
     </main>
   );
 }
