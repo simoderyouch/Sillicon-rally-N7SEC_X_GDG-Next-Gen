@@ -14,20 +14,17 @@ function nextRound() { fireEvent.click(screen.getByRole("button", { name: /open 
 afterEach(cleanup);
 
 describe("code-breaker game", () => {
-  it("reports the full score for cracking all six codes on the first attempt", () => {
+  it("reports the full score for cracking all three codes on the first attempt", () => {
     const onComplete = vi.fn();
     const Component = game.component;
     render(<Component mission={mission} onComplete={onComplete} />);
 
     enter("Comet", "Orbit", "Spark"); nextRound();
-    enter("Wave", "Cube", "Moon"); nextRound();
     enter("Spark", "Moon", "Orbit", "Cube"); nextRound();
-    enter("Bolt", "Leaf", "Wave", "Comet"); nextRound();
-    enter("Cube", "Comet", "Spark", "Moon", "Bolt"); nextRound();
     enter("Moon", "Bolt", "Moon", "Leaf", "Orbit");
     fireEvent.click(screen.getByRole("button", { name: /dispatch result/i }));
 
-    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ score: 100, completed: true, details: expect.objectContaining({ roundsCleared: 6, guesses: 6 }) }));
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ score: 100, completed: true, details: expect.objectContaining({ roundsCleared: 3, guesses: 3 }) }));
   });
 
   it("shows exact, shifted, and absent feedback for a guess", () => {
