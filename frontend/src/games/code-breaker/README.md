@@ -2,7 +2,7 @@
 
 ## Game plan
 
-Code Breaker is a six-round deduction puzzle for teams. Players assemble a sequence from eight symbols and submit it to uncover three clear clues:
+Code Breaker is a three-round deduction puzzle for teams. Players assemble a sequence from eight symbols and submit it to uncover three clear clues:
 
 - **Exact** — the right symbol in the right slot.
 - **Shifted** — the right symbol, but in a different slot.
@@ -12,20 +12,17 @@ The board is intentionally collaborative: one teammate can read the feedback log
 
 ## Rounds and scoring
 
-| Round | Slots | Attempts | Maximum | Deduction per wrong guess |
-| --- | ---: | ---: | ---: | ---: |
-| 1 · Warm-up | 3 | 6 | 8 | 1 |
-| 2 · Pattern | 3 | 5 | 10 | 1 |
-| 3 · Cross-check | 4 | 6 | 13 | 1 |
-| 4 · Pressure | 4 | 5 | 16 | 2 |
-| 5 · Cipher | 5 | 5 | 22 | 3 |
-| 6 · Final code | 5 | 4 | 31 | 4 |
+| Round | Slots | Attempts | Maximum | Deduction per wrong guess | Hint cost |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 1 · Opening key | 3 | 6 | 25 | 2 | 3 |
+| 2 · Crossing wires | 4 | 5 | 32 | 3 | 4 |
+| 3 · Master sequence | 5 | 4 | 43 | 5 | 5 |
 
-The round maxima add to 100 points. A solved code earns its maximum minus the listed deduction for each earlier wrong guess. A single optional hint can reveal one position in a round for a further 3-point deduction. If a team uses all attempts without cracking a code, the run ends and nothing is submitted.
+The round maxima add to 100 points. A solved code earns its maximum minus the listed deduction for each earlier wrong guess. A single optional hint can reveal one position in a round for the listed deduction. If a team uses all attempts without cracking a code, the run ends and nothing is submitted.
 
 ## Test coverage
 
-`Game.test.tsx` verifies a full-score six-round run, feedback categories, and the no-submission failure path.
+`Game.test.tsx` verifies a full-score three-round run, feedback categories, and the no-submission failure path.
 
 ## Scope
 

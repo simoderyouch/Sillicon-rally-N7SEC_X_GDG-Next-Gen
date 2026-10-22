@@ -13,13 +13,10 @@ const symbols: { id: SymbolId; name: string; glyph: string }[] = [
   { id: "moon", name: "Moon", glyph: "☾" }, { id: "bolt", name: "Bolt", glyph: "ϟ" },
 ];
 
-const rounds: { secret: SymbolId[]; attempts: number; maxPoints: number; penalty: number; label: string }[] = [
-  { secret: ["comet", "orbit", "spark"], attempts: 6, maxPoints: 8, penalty: 1, label: "Warm-up" },
-  { secret: ["wave", "cube", "moon"], attempts: 5, maxPoints: 10, penalty: 1, label: "Pattern" },
-  { secret: ["spark", "moon", "orbit", "cube"], attempts: 6, maxPoints: 13, penalty: 1, label: "Cross-check" },
-  { secret: ["bolt", "leaf", "wave", "comet"], attempts: 5, maxPoints: 16, penalty: 2, label: "Pressure" },
-  { secret: ["cube", "comet", "spark", "moon", "bolt"], attempts: 5, maxPoints: 22, penalty: 3, label: "Cipher" },
-  { secret: ["moon", "bolt", "moon", "leaf", "orbit"], attempts: 4, maxPoints: 31, penalty: 4, label: "Final code" },
+const rounds: { secret: SymbolId[]; attempts: number; maxPoints: number; penalty: number; hintPenalty: number; label: string }[] = [
+  { secret: ["comet", "orbit", "spark"], attempts: 6, maxPoints: 25, penalty: 2, hintPenalty: 3, label: "Opening key" },
+  { secret: ["spark", "moon", "orbit", "cube"], attempts: 5, maxPoints: 32, penalty: 3, hintPenalty: 4, label: "Crossing wires" },
+  { secret: ["moon", "bolt", "moon", "leaf", "orbit"], attempts: 4, maxPoints: 43, penalty: 5, hintPenalty: 5, label: "Master sequence" },
 ];
 
 function symbolFor(id: SymbolId) { return symbols.find((symbol) => symbol.id === id)!; }
@@ -87,7 +84,7 @@ function CodeBreaker({ mission, onComplete, disabled = false }: GameProps) {
     setDraft([]);
 
     if (feedback.exact === currentRound.secret.length) {
-      const roundScore = Math.max(1, currentRound.maxPoints - (history.length * currentRound.penalty) - (hintRevealed ? 3 : 0));
+      const roundScore = Math.max(1, currentRound.maxPoints - (history.length * currentRound.penalty) - (hintRevealed ? currentRound.hintPenalty : 0));
       setEarnedScore((value) => value + roundScore);
       setPhase(round === rounds.length - 1 ? "complete" : "between-rounds");
       return;
@@ -130,7 +127,7 @@ function CodeBreaker({ mission, onComplete, disabled = false }: GameProps) {
   const message = phase === "failed"
     ? { kicker: `Round ${round + 1} · code unsolved`, title: "Run over.", body: "No attempts remain. This run is not submitted—start again from the first code." }
     : phase === "complete"
-      ? { kicker: "All six codes solved", title: "Sequence cracked.", body: `${earnedScore} points secured. Dispatch the result to record your team score.` }
+      ? { kicker: "All three codes solved", title: "Sequence cracked.", body: `${earnedScore} points secured. Dispatch the result to record your team score.` }
       : phase === "between-rounds"
         ? { kicker: `Round ${round + 1} cleared`, title: "Code accepted.", body: `${earnedScore} points secured. The next code has fewer chances to test.` }
         : { kicker: `Round ${round + 1} of ${rounds.length} · ${currentRound.maxPoints} points maximum`, title: history.length ? "Read the feedback. Refine the sequence." : "Build the hidden sequence.", body: `${triesLeft} ${triesLeft === 1 ? "attempt" : "attempts"} remain. Exact means the right symbol in the right slot.` };
@@ -152,13 +149,13 @@ function CodeBreaker({ mission, onComplete, disabled = false }: GameProps) {
             <div className="code-breaker-controls"><button type="button" className="code-control" onClick={removeSymbol} disabled={!draft.length || disabled || finished}>Undo</button><button type="button" className="code-control" onClick={resetDraft} disabled={!draft.length || disabled || finished}>Clear</button><button type="button" className="code-check" onClick={checkGuess} disabled={draft.length !== currentRound.secret.length || disabled || finished}>Check sequence <span aria-hidden="true">→</span></button></div>
           </div>
           <div className="code-breaker-palette" aria-label="Available symbols">{symbols.map((symbol) => <button key={symbol.id} type="button" className={`code-symbol code-symbol-${symbol.id}`} onClick={() => addSymbol(symbol.id)} disabled={draft.length >= currentRound.secret.length || disabled || finished} aria-label={`Add ${symbol.name}`}><span aria-hidden="true">{symbol.glyph}</span><small>{symbol.name}</small></button>)}</div>
-          <div className="code-breaker-hint"><div><span>Need a hand?</span><small>{hintRevealed ? `Position ${revealedIndex + 1} is ${symbolFor(currentRound.secret[revealedIndex]).name}.` : "Reveal one position in this code."}</small></div><button type="button" onClick={revealHint} disabled={hintRevealed || disabled || finished}>Reveal position <b>−3 pts</b></button></div>
+          <div className="code-breaker-hint"><div><span>Need a hand?</span><small>{hintRevealed ? `Position ${revealedIndex + 1} is ${symbolFor(currentRound.secret[revealedIndex]).name}.` : "Reveal one position in this code."}</small></div><button type="button" onClick={revealHint} disabled={hintRevealed || disabled || finished}>Reveal position <b>−{currentRound.hintPenalty} pts</b></button></div>
         </>}
         {history.length > 0 && <div className="code-breaker-history"><div className="history-heading"><span>Attempt log</span><small>Exact = right symbol, right slot · Shifted = right symbol, different slot</small></div>{history.map((guess, index) => <div className="guess-row" key={`${round}-${index}`}><span className="guess-number">{String(index + 1).padStart(2, "0")}</span><div className="guess-symbols">{guess.symbols.map((symbol, position) => <span className={`guess-token code-symbol-${symbol}`} key={`${symbol}-${position}`} aria-label={symbolFor(symbol).name}>{symbolFor(symbol).glyph}</span>)}</div><div className="guess-feedback"><span className="feedback-exact">{guess.exact} exact</span><span className="feedback-shifted">{guess.shifted} shifted</span><span className="feedback-absent">{guess.absent} absent</span></div></div>)}</div>}
         {phase === "between-rounds" && <button type="button" className="code-breaker-next" onClick={nextRound} disabled={disabled || finished}>Open round {round + 2} <span aria-hidden="true">→</span></button>}
         {phase === "failed" && <button type="button" className="code-breaker-next" onClick={restart} disabled={disabled || finished}>Start a new run <span aria-hidden="true">↺</span></button>}
       </div>
-      <div className="game-action-row"><span>{phase === "complete" ? "All six codes are ready to record." : phase === "failed" ? "This run has ended. Begin again to crack the full sequence." : "Clear all six codes to unlock dispatch."}</span><button className="button-primary" onClick={finish} disabled={phase !== "complete" || disabled || finished}>{finished ? "Result recorded" : "Dispatch result"} <span aria-hidden="true">→</span></button></div>
+      <div className="game-action-row"><span>{phase === "complete" ? "All three codes are ready to record." : phase === "failed" ? "This run has ended. Begin again to crack the full sequence." : "Clear all three codes to unlock dispatch."}</span><button className="button-primary" onClick={finish} disabled={phase !== "complete" || disabled || finished}>{finished ? "Result recorded" : "Dispatch result"} <span aria-hidden="true">→</span></button></div>
     </section>
   );
 }
