@@ -55,6 +55,14 @@ export function AdminDashboard() {
     mutationFn: () => api.resetLeaderboard(token!),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["leaderboard"] }),
   });
+  const wipeEvent = useMutation({
+    mutationFn: () => api.wipeEvent(token!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "teams"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "event"] });
+      queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
+    },
+  });
 
   if (!token) return <Navigate to="/admin" replace />;
 
@@ -70,6 +78,9 @@ export function AdminDashboard() {
   function confirmReset() {
     if (window.confirm("Remove every team score and reset the live leaderboard? This cannot be undone.")) resetLeaderboard.mutate();
   }
+  function confirmWipe() {
+    if (window.confirm("Wipe every team, every score, and all team sessions? The event will close. This cannot be undone.")) wipeEvent.mutate();
+  }
 
   return <section className="admin-dashboard">
     <div className="page-heading">
@@ -83,8 +94,9 @@ export function AdminDashboard() {
         <div className="admin-action-row">
           <button className={isOpen ? "button-secondary" : "button-primary"} onClick={() => updateEvent.mutate(!isOpen)} disabled={updateEvent.isPending}>{isOpen ? "Close event" : "Open event"}<span aria-hidden="true">→</span></button>
           <button className="button-danger" onClick={confirmReset} disabled={resetLeaderboard.isPending}>Reset leaderboard</button>
+          <button className="button-danger button-wipe" onClick={confirmWipe} disabled={wipeEvent.isPending}>Wipe teams & event</button>
         </div>
-        {(updateEvent.error || resetLeaderboard.error) && <p className="error" role="alert">{(updateEvent.error ?? resetLeaderboard.error)?.message}</p>}
+        {(updateEvent.error || resetLeaderboard.error || wipeEvent.error) && <p className="error" role="alert">{(updateEvent.error ?? resetLeaderboard.error ?? wipeEvent.error)?.message}</p>}
       </div>
       <div className="admin-stat"><span>{teams.data?.length ?? "—"}</span><p>registered teams</p></div>
     </div>

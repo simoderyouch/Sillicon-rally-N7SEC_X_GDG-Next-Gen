@@ -12,5 +12,6 @@ public class EventStateService {
   public EventStateService(EventStateRepository states) { this.states = states; }
   public EventDtos.EventStateResponse get() { return EventDtos.from(state()); }
   public EventDtos.EventStateResponse update(EventDtos.UpdateEventStateRequest request) { EventState state = state(); state.update(request.isOpen(), request.leaderboardLocked()); return EventDtos.from(state); }
+  public void reset() { state().update(false, false); }
   private EventState state() { return states.findById(1L).orElseThrow(() -> new ResponseStatusException(INTERNAL_SERVER_ERROR, "Event state has not been initialized")); }
 }

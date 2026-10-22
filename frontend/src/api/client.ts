@@ -55,5 +55,6 @@ export const api = {
       body: JSON.stringify(patch),
     }),
   resetLeaderboard: (token: string) => request<void>("/api/v1/admin/leaderboard/reset", { method: "POST", headers: { "X-Admin-Token": token } }),
+  wipeEvent: (token: string) => request<void>("/api/v1/admin/event/wipe", { method: "POST", headers: { "X-Admin-Token": token } }),
 };
 

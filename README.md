@@ -57,6 +57,7 @@ The platform owns team identity, event controls, the mission catalogue, points, 
 | Score bridge | `POST /api/v1/games/{slug}/score` | Save the team's best score for a published challenge. Only the shared game runner calls this. |
 | Leaderboard | `GET /api/v1/leaderboard`, `ws://<host>/ws/leaderboard` | Read and subscribe to the public ranked board. |
 | Leaderboard admin | `POST /api/v1/admin/leaderboard/reset` | Delete all score records and immediately broadcast an empty board. |
+| Event wipe | `POST /api/v1/admin/event/wipe` | Delete all teams and scores, revoke team sessions, close/unlock the event, and broadcast an empty board. |
 
 ## Game team workflow
 
