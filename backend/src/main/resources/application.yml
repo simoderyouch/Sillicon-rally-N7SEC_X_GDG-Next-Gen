@@ -27,7 +27,7 @@ app:
     open-team-registration: ${OPEN_TEAM_REGISTRATION:true}
   admin:
     email: ${ADMIN_EMAIL:admin@sillicon-rally.local}
-    password: ${ADMIN_PASSWORD:change-me-before-an-event}
+    password: ${ADMIN_PASSWORD:admin-gdg}
   session:
     token-ttl: ${APP_SESSION_TOKEN_TTL:PT12H}
   realtime:

@@ -19,7 +19,7 @@ cp .env.example .env
 docker compose up -d postgres redis
 
 cd backend
-ADMIN_EMAIL=admin@sillicon-rally.local ADMIN_PASSWORD=change-me-before-an-event \
+ADMIN_EMAIL=admin@sillicon-rally.local ADMIN_PASSWORD=admin-gdg \
 SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/sillicon_rally \
 SPRING_DATASOURCE_USERNAME=sillicon SPRING_DATASOURCE_PASSWORD=change-me \
 mvn spring-boot:run
