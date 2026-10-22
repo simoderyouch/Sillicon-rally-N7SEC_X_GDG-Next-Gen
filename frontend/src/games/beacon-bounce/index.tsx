@@ -15,9 +15,9 @@ const rounds: { route: BeaconId[]; pace: number; label: string; points: number }
   { route: ["sun", "rose", "mint"], pace: 760, label: "Steady", points: 8 },
   { route: ["violet", "ember", "lime"], pace: 650, label: "Brisk", points: 10 },
   { route: ["pearl", "sun", "plum", "rose"], pace: 540, label: "Quick", points: 13 },
-  { route: ["mint", "violet", "apricot", "ember"], pace: 450, label: "Rapid", points: 16 },
-  { route: ["lime", "pearl", "rose", "plum", "sun"], pace: 360, label: "Fast", points: 22 },
-  { route: ["apricot", "mint", "ember", "violet", "lime", "pearl"], pace: 285, label: "Full speed", points: 31 },
+  { route: ["mint", "violet", "apricot", "ember", "sun", "plum"], pace: 380, label: "Hard mode", points: 16 },
+  { route: ["lime", "pearl", "rose", "plum", "sun", "mint", "violet"], pace: 300, label: "Harder", points: 22 },
+  { route: ["apricot", "mint", "ember", "violet", "lime", "pearl", "sun", "plum", "rose"], pace: 235, label: "Final burst", points: 31 },
 ];
 
 const hintActions = ["Replay this route", "Pin the first two stops"];
@@ -113,7 +113,7 @@ function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
         ? { eyebrow: `Round ${round + 1} · ${currentRound.points} points`, title: "Watch the route.", body: "The board will unlock when the final beacon fades." }
         : phase === "input"
           ? { eyebrow: `Round ${round + 1} · ${currentRound.points} points`, title: `${attempt.length} of ${currentRound.route.length} beacons repeated.`, body: "Choose the next beacon. One wrong tap ends this run." }
-          : { eyebrow: `Round ${round + 1} of ${rounds.length} · ${currentRound.points} points`, title: round === 0 ? "Ready for the first route." : "Route cleared.", body: round === 0 ? "Watch the order, then repeat it exactly. One wrong tap ends the run." : `${earnedScore} points secured. The next route plays faster.` };
+          : { eyebrow: `Round ${round + 1} of ${rounds.length} · ${currentRound.points} points`, title: round === 0 ? "Ready for the first route." : "Route cleared.", body: round === 0 ? "Watch the order, then repeat it exactly. One wrong tap ends the run." : round === 3 ? `${earnedScore} points secured. Hard mode begins: six beacons at 380 ms.` : `${earnedScore} points secured. The next route plays faster.` };
 
   return (
     <section className="game-shell beacon-bounce">

@@ -15,9 +15,11 @@ Each cleared route permanently secures its listed points. The six values total t
 | 1 | Steady · 760 ms | 3 beacons | 8 |
 | 2 | Brisk · 650 ms | 3 beacons | 10 |
 | 3 | Quick · 540 ms | 4 beacons | 13 |
-| 4 | Rapid · 450 ms | 4 beacons | 16 |
-| 5 | Fast · 360 ms | 5 beacons | 22 |
-| 6 | Full speed · 285 ms | 6 beacons | 31 |
+| 4 | Hard mode · 380 ms | 6 beacons | 16 |
+| 5 | Harder · 300 ms | 7 beacons | 22 |
+| 6 | Final burst · 235 ms | 9 beacons | 31 |
+
+Rounds 1–3 teach the rhythm. Round 4 is the hard-mode breakpoint: routes become longer and the beacon pace drops sharply. Rounds 5 and 6 require teams to remember seven and then all nine beacons under faster playback.
 
 ## Hints
 
