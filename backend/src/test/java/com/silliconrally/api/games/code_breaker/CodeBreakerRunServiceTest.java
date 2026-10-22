@@ -32,20 +32,20 @@ class CodeBreakerRunServiceTest {
     CodeBreakerPuzzle puzzle = new CodeBreakerPuzzle();
     List<String> wrongCode = wrongCode(puzzle, team, 0);
 
-    assertThat(service.start(team).attemptsRemaining()).isEqualTo(6);
+    assertThat(service.start(team).attemptsRemaining()).isEqualTo(7);
     CodeBreakerRunService.AttemptResponse last = null;
-    for (int attempt = 0; attempt < 6; attempt += 1) last = service.attempt(team, 0, wrongCode);
+    for (int attempt = 0; attempt < 7; attempt += 1) last = service.attempt(team, 0, wrongCode);
 
     assertThat(last).isNotNull();
     assertThat(last.roundFailed()).isTrue();
     assertThat(last.nextRound()).isEqualTo(1);
-    assertThat(last.attemptsRemaining()).isEqualTo(5);
+    assertThat(last.attemptsRemaining()).isEqualTo(6);
     assertThat(service.start(team).round()).isEqualTo(1);
     assertThatThrownBy(() -> service.attempt(team, 0, wrongCode))
       .isInstanceOf(ResponseStatusException.class)
       .hasMessageContaining("not the active");
 
-    for (int attempt = 0; attempt < 5; attempt += 1) service.attempt(team, 1, wrongCode(puzzle, team, 1));
+    for (int attempt = 0; attempt < 6; attempt += 1) service.attempt(team, 1, wrongCode(puzzle, team, 1));
     for (int attempt = 0; attempt < 4; attempt += 1) service.attempt(team, 2, wrongCode(puzzle, team, 2));
     assertThat(service.verifiedResult(team)).extracting(CodeBreakerRunService.VerifiedResult::score, CodeBreakerRunService.VerifiedResult::completed).containsExactly(0, true);
   }

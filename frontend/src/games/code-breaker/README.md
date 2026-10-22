@@ -14,9 +14,9 @@ The board is intentionally collaborative: one teammate can read the feedback log
 
 | Round | Slots | Attempts | Maximum | Deduction per wrong guess | Hint cost |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 · Opening key | 3 | 6 | 25 | 2 | 3 |
-| 2 · Crossing wires | 4 | 5 | 32 | 3 | 4 |
-| 3 · Master sequence | 5 | 4 | 43 | 5 | 5 |
+| 1 · Warm-up code | 3 | 7 | 20 | 1 | 2 |
+| 2 · Practice signal | 3 | 6 | 30 | 2 | 3 |
+| 3 · Master sequence | 5 | 4 | 50 | 5 | 5 |
 
 The round maxima add to 100 points. A solved code earns its maximum minus the listed deduction for each earlier wrong guess. A single optional hint can reveal one position in a round for the listed deduction. If a team uses all attempts without cracking a code, that round is locked and the team continues to the next round. Once round 3 ends, the secured result must be dispatched.
 

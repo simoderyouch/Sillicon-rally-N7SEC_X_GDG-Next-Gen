@@ -18,10 +18,10 @@ import static org.springframework.http.HttpStatus.CONFLICT;
 public class CodeBreakerRunService {
   private static final String PREFIX = "sillicon-rally:code-breaker:run:";
   private static final Duration TTL = Duration.ofHours(12);
-  private static final int[] ATTEMPTS = {6, 5, 4};
-  private static final int[] MAX_POINTS = {25, 32, 43};
-  private static final int[] WRONG_GUESS_PENALTY = {2, 3, 5};
-  private static final int[] HINT_PENALTY = {3, 4, 5};
+  private static final int[] ATTEMPTS = {7, 6, 4};
+  private static final int[] MAX_POINTS = {20, 30, 50};
+  private static final int[] WRONG_GUESS_PENALTY = {1, 2, 5};
+  private static final int[] HINT_PENALTY = {2, 3, 5};
 
   private final StringRedisTemplate redis;
   private final ObjectMapper json;

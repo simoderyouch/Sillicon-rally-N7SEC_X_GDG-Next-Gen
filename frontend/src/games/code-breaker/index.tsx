@@ -16,9 +16,9 @@ const symbols: { id: SymbolId; name: string; icon: LucideIcon }[] = [
 ];
 
 const rounds: { slots: number; attempts: number; maxPoints: number; penalty: number; hintPenalty: number; label: string }[] = [
-  { slots: 3, attempts: 6, maxPoints: 25, penalty: 2, hintPenalty: 3, label: "Opening key" },
-  { slots: 4, attempts: 5, maxPoints: 32, penalty: 3, hintPenalty: 4, label: "Crossing wires" },
-  { slots: 5, attempts: 4, maxPoints: 43, penalty: 5, hintPenalty: 5, label: "Master sequence" },
+  { slots: 3, attempts: 7, maxPoints: 20, penalty: 1, hintPenalty: 2, label: "Warm-up code" },
+  { slots: 3, attempts: 6, maxPoints: 30, penalty: 2, hintPenalty: 3, label: "Practice signal" },
+  { slots: 5, attempts: 4, maxPoints: 50, penalty: 5, hintPenalty: 5, label: "Master sequence" },
 ];
 
 function symbolFor(id: string) { return symbols.find((symbol) => symbol.id === id); }
