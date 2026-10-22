@@ -1,5 +1,6 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowUpRight, Flag, UsersRound } from "lucide-react";
 import { api } from "../api/client";
 
 export function JoinTeam() {
@@ -24,10 +25,10 @@ export function JoinTeam() {
 
   return <section className="join-layout">
     <div className="join-intro">
-      <p className="eyebrow">Checkpoint 00 · team check-in</p>
+      <p className="eyebrow"><Flag size={13} /> Checkpoint 00 · team check-in</p>
       <h1>Put your crew<br /><em>on the route.</em></h1>
       <p className="lede">Choose the team name your crew will carry through every mission and up the standings.</p>
-      <div className="rally-note"><span aria-hidden="true">↗</span><p><strong>One name. One score.</strong><br />Your team session keeps your mission progress together on this device.</p></div>
+      <div className="rally-note"><UsersRound aria-hidden="true" size={20} /><p><strong>One name. One score.</strong><br />Your team session keeps your mission progress together on this device.</p></div>
     </div>
     <div className="form-card join-card">
       <p className="form-kicker">Rally access</p>
@@ -35,7 +36,7 @@ export function JoinTeam() {
       <form onSubmit={submit}>
         <label>Team name<input required autoFocus placeholder="e.g. Packet Pilots" value={teamName} onChange={(e) => setTeamName(e.target.value)} /></label>
         <label>Join code <small>Optional in local development</small><input placeholder="Enter event code" value={joinCode} onChange={(e) => setJoinCode(e.target.value)} /></label>
-        <button className="button-primary" disabled={loading}>{loading ? "Joining rally…" : "Join rally"}<span aria-hidden="true">→</span></button>
+        <button className="button-primary" disabled={loading}>{loading ? "Joining rally…" : "Join rally"}<ArrowUpRight aria-hidden="true" size={17} /></button>
         {error && <p className="error" role="alert">{error}</p>}
       </form>
     </div>

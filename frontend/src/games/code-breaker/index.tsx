@@ -1,4 +1,5 @@
 import { useState, type CSSProperties } from "react";
+import { Box, CircleDot, Leaf, Moon, Rocket, Sparkles, Waves, Zap, type LucideIcon } from "lucide-react";
 import type { GameDefinition, GameProps } from "../types";
 import { codeBreakerApi } from "./gameApi";
 import "./code-breaker.css";
@@ -7,11 +8,11 @@ type SymbolId = "comet" | "orbit" | "spark" | "leaf" | "wave" | "cube" | "moon" 
 type Phase = "building" | "between-rounds" | "complete" | "failed";
 type GuessRecord = { symbols: SymbolId[]; exact: number; shifted: number; absent: number };
 
-const symbols: { id: SymbolId; name: string; glyph: string }[] = [
-  { id: "comet", name: "Comet", glyph: "✦" }, { id: "orbit", name: "Orbit", glyph: "◉" },
-  { id: "spark", name: "Spark", glyph: "✳" }, { id: "leaf", name: "Leaf", glyph: "◆" },
-  { id: "wave", name: "Wave", glyph: "≈" }, { id: "cube", name: "Cube", glyph: "▣" },
-  { id: "moon", name: "Moon", glyph: "☾" }, { id: "bolt", name: "Bolt", glyph: "ϟ" },
+const symbols: { id: SymbolId; name: string; icon: LucideIcon }[] = [
+  { id: "comet", name: "Comet", icon: Rocket }, { id: "orbit", name: "Orbit", icon: CircleDot },
+  { id: "spark", name: "Spark", icon: Sparkles }, { id: "leaf", name: "Leaf", icon: Leaf },
+  { id: "wave", name: "Wave", icon: Waves }, { id: "cube", name: "Cube", icon: Box },
+  { id: "moon", name: "Moon", icon: Moon }, { id: "bolt", name: "Bolt", icon: Zap },
 ];
 
 const rounds: { slots: number; attempts: number; maxPoints: number; penalty: number; hintPenalty: number; label: string }[] = [
@@ -21,6 +22,7 @@ const rounds: { slots: number; attempts: number; maxPoints: number; penalty: num
 ];
 
 function symbolFor(id: string) { return symbols.find((symbol) => symbol.id === id); }
+function SymbolGlyph({ id }: { id: SymbolId }) { const Icon = symbolFor(id)?.icon; return Icon ? <Icon aria-hidden="true" strokeWidth={1.7} /> : null; }
 
 function CodeBreaker({ mission, onComplete, disabled = false }: GameProps) {
   const [round, setRound] = useState(0);
@@ -142,16 +144,16 @@ function CodeBreaker({ mission, onComplete, disabled = false }: GameProps) {
             <div className="code-breaker-draft" aria-label="Current sequence" style={{ "--slot-count": currentRound.slots } as CSSProperties}>
               {Array.from({ length: currentRound.slots }, (_, index) => {
                 const symbol = draft[index];
-                return <div className={`code-slot ${symbol ? "is-filled" : ""}`} key={index}><small>0{index + 1}</small><span aria-label={symbol ? symbolFor(symbol)?.name : "Empty slot"}>{symbol ? symbolFor(symbol)?.glyph : "·"}</span></div>;
+                return <div className={`code-slot ${symbol ? "is-filled" : ""}`} key={index}><small>0{index + 1}</small><span aria-label={symbol ? symbolFor(symbol)?.name : "Empty slot"}>{symbol ? <SymbolGlyph id={symbol} /> : "·"}</span></div>;
               })}
             </div>
             <div className="code-breaker-controls"><button type="button" className="code-control" onClick={removeSymbol} disabled={!draft.length || disabled || isChecking || finished}>Undo</button><button type="button" className="code-control" onClick={resetDraft} disabled={!draft.length || disabled || isChecking || finished}>Clear</button><button type="button" className="code-check" onClick={checkGuess} disabled={draft.length !== currentRound.slots || disabled || isChecking || finished}>{isChecking ? "Checking…" : "Check sequence"} <span aria-hidden="true">→</span></button></div>
           </div>
-          <div className="code-breaker-palette" aria-label="Available symbols">{symbols.map((symbol) => <button key={symbol.id} type="button" className={`code-symbol code-symbol-${symbol.id}`} onClick={() => addSymbol(symbol.id)} disabled={draft.length >= currentRound.slots || disabled || isChecking || finished} aria-label={`Add ${symbol.name}`}><span aria-hidden="true">{symbol.glyph}</span><small>{symbol.name}</small></button>)}</div>
+          <div className="code-breaker-palette" aria-label="Available symbols">{symbols.map((symbol) => <button key={symbol.id} type="button" className={`code-symbol code-symbol-${symbol.id}`} onClick={() => addSymbol(symbol.id)} disabled={draft.length >= currentRound.slots || disabled || isChecking || finished} aria-label={`Add ${symbol.name}`}><SymbolGlyph id={symbol.id} /><small>{symbol.name}</small></button>)}</div>
           <div className="code-breaker-hint"><div><span>Need a hand?</span><small>{hint ? `Position ${hint.position + 1} is ${symbolFor(hint.symbol)?.name}.` : "Reveal one position in your team code."}</small></div><button type="button" onClick={revealHint} disabled={Boolean(hint) || disabled || isChecking || finished}>Reveal position <b>−{currentRound.hintPenalty} pts</b></button></div>
         </>}
         {requestError && <p className="code-breaker-error" role="alert">{requestError}</p>}
-        {history.length > 0 && <div className="code-breaker-history"><div className="history-heading"><span>Attempt log</span><small>Exact = right symbol, right slot · Shifted = right symbol, different slot</small></div>{history.map((guess, index) => <div className="guess-row" key={`${round}-${index}`}><span className="guess-number">{String(index + 1).padStart(2, "0")}</span><div className="guess-symbols">{guess.symbols.map((symbol, position) => <span className={`guess-token code-symbol-${symbol}`} key={`${symbol}-${position}`} aria-label={symbolFor(symbol)?.name}>{symbolFor(symbol)?.glyph}</span>)}</div><div className="guess-feedback"><span className="feedback-exact">{guess.exact} exact</span><span className="feedback-shifted">{guess.shifted} shifted</span><span className="feedback-absent">{guess.absent} absent</span></div></div>)}</div>}
+        {history.length > 0 && <div className="code-breaker-history"><div className="history-heading"><span>Attempt log</span><small>Exact = right symbol, right slot · Shifted = right symbol, different slot</small></div>{history.map((guess, index) => <div className="guess-row" key={`${round}-${index}`}><span className="guess-number">{String(index + 1).padStart(2, "0")}</span><div className="guess-symbols">{guess.symbols.map((symbol, position) => <span className={`guess-token code-symbol-${symbol}`} key={`${symbol}-${position}`} aria-label={symbolFor(symbol)?.name}><SymbolGlyph id={symbol} /></span>)}</div><div className="guess-feedback"><span className="feedback-exact">{guess.exact} exact</span><span className="feedback-shifted">{guess.shifted} shifted</span><span className="feedback-absent">{guess.absent} absent</span></div></div>)}</div>}
         {phase === "between-rounds" && <button type="button" className="code-breaker-next" onClick={nextRound} disabled={disabled || isChecking || finished}>Open round {round + 2} <span aria-hidden="true">→</span></button>}
         {phase === "failed" && <button type="button" className="code-breaker-next" onClick={restart} disabled={disabled || isChecking || finished}>Start a new run <span aria-hidden="true">↺</span></button>}
       </div>

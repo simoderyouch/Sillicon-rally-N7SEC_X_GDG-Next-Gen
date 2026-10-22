@@ -1,14 +1,15 @@
 import { useState } from "react";
+import { Circle, Diamond, Hexagon, Plus, Sparkles, Star, Sun, Triangle, Zap, type LucideIcon } from "lucide-react";
 import type { GameDefinition, GameProps } from "../types";
 import "./beacon-bounce.css";
 
 type BeaconId = "sun" | "rose" | "mint" | "violet" | "ember" | "pearl" | "lime" | "plum" | "apricot";
 type Phase = "ready" | "showing" | "input" | "complete" | "failed";
 
-const beacons: { id: BeaconId; name: string; glyph: string }[] = [
-  { id: "sun", name: "Sun", glyph: "✦" }, { id: "rose", name: "Rose", glyph: "●" }, { id: "mint", name: "Mint", glyph: "◆" },
-  { id: "violet", name: "Violet", glyph: "✳" }, { id: "ember", name: "Ember", glyph: "▲" }, { id: "pearl", name: "Pearl", glyph: "○" },
-  { id: "lime", name: "Lime", glyph: "✚" }, { id: "plum", name: "Plum", glyph: "⬟" }, { id: "apricot", name: "Apricot", glyph: "✶" },
+const beacons: { id: BeaconId; name: string; icon: LucideIcon }[] = [
+  { id: "sun", name: "Sun", icon: Sun }, { id: "rose", name: "Rose", icon: Circle }, { id: "mint", name: "Mint", icon: Diamond },
+  { id: "violet", name: "Violet", icon: Sparkles }, { id: "ember", name: "Ember", icon: Triangle }, { id: "pearl", name: "Pearl", icon: Star },
+  { id: "lime", name: "Lime", icon: Plus }, { id: "plum", name: "Plum", icon: Hexagon }, { id: "apricot", name: "Apricot", icon: Zap },
 ];
 
 const rounds: { route: BeaconId[]; pace: number; label: string; points: number }[] = [
@@ -123,7 +124,7 @@ function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
         <div className="beacon-bounce-stage">
           <div className={`beacon-bounce-round-message is-${phase}`} aria-live="polite"><span>{roundMessage.eyebrow}</span><strong>{roundMessage.title}</strong><p>{roundMessage.body}</p></div>
           <div className="beacon-bounce-grid" aria-label="Beacon route board">
-            {beacons.map((beacon) => <button key={beacon.id} type="button" className={`beacon beacon-${beacon.id} ${activeBeacon === beacon.id ? "is-lit" : ""} ${attempt.includes(beacon.id) && phase === "input" ? "is-picked" : ""}`} aria-label={`Beacon ${beacon.name}`} disabled={phase !== "input" || disabled || finished} onClick={() => chooseBeacon(beacon.id)}><span aria-hidden="true">{beacon.glyph}</span><small>{beacon.name}</small></button>)}
+            {beacons.map((beacon) => <button key={beacon.id} type="button" className={`beacon beacon-${beacon.id} ${activeBeacon === beacon.id ? "is-lit" : ""} ${attempt.includes(beacon.id) && phase === "input" ? "is-picked" : ""}`} aria-label={`Beacon ${beacon.name}`} disabled={phase !== "input" || disabled || finished} onClick={() => chooseBeacon(beacon.id)}><beacon.icon aria-hidden="true" strokeWidth={1.7} /><small>{beacon.name}</small></button>)}
           </div>
           {showPinnedStart && phase !== "failed" && <p className="beacon-bounce-pinned">Pinned start: {currentRound.route.slice(0, 2).map((id) => beacons.find((beacon) => beacon.id === id)?.name).join(" → ")}</p>}
           {phase === "failed" ? <button type="button" className="beacon-bounce-show" onClick={resetRun} disabled={disabled || finished}>Start again <span aria-hidden="true">↺</span><small>Return to round 1 · 0 points</small></button> : <button type="button" className="beacon-bounce-show" disabled={phase !== "ready" || disabled || finished} onClick={showRoute}>{round === 0 ? "Show the first route" : "Show next route"} <span aria-hidden="true">↗</span><small>{currentRound.label} · {currentRound.route.length} beacons · {currentRound.points} points</small></button>}
