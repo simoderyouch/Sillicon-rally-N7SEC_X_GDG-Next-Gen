@@ -13,6 +13,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     throw new Error(body.message ?? "Request failed");
   }
 
+  if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
 }
 
@@ -43,6 +44,9 @@ export const api = {
       headers: { "X-Admin-Token": token },
       body: JSON.stringify(patch),
     }),
+  adminMissions: (token: string) => request<Mission[]>("/api/v1/admin/missions", { headers: { "X-Admin-Token": token } }),
+  createMission: (token: string, mission: Omit<Mission, "id">) => request<Mission>("/api/v1/admin/missions", { method: "POST", headers: { "X-Admin-Token": token }, body: JSON.stringify(mission) }),
+  updateMission: (token: string, id: string, mission: Omit<Mission, "id">) => request<Mission>(`/api/v1/admin/missions/${id}`, { method: "PUT", headers: { "X-Admin-Token": token }, body: JSON.stringify(mission) }),
   eventState: (token: string) => request<EventState>("/api/v1/admin/event", { headers: { "X-Admin-Token": token } }),
   updateEventState: (token: string, patch: Partial<EventState>) =>
     request<EventState>("/api/v1/admin/event", {
@@ -50,5 +54,6 @@ export const api = {
       headers: { "X-Admin-Token": token },
       body: JSON.stringify(patch),
     }),
+  resetLeaderboard: (token: string) => request<void>("/api/v1/admin/leaderboard/reset", { method: "POST", headers: { "X-Admin-Token": token } }),
 };
 

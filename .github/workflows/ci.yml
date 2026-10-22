@@ -22,11 +22,12 @@ jobs:
           frontend_allowed="frontend/src/games/${slug}/"
           package_slug=$(printf '%s' "$slug" | tr '-' '_')
           backend_allowed="backend/src/main/java/com/silliconrally/api/games/${package_slug}/"
+          backend_tests_allowed="backend/src/test/java/com/silliconrally/api/games/${package_slug}/"
           changed_files=$(git diff --name-only "$BASE_SHA" HEAD)
           for file in $changed_files; do
             case "$file" in
-              "$frontend_allowed"* | "$backend_allowed"*) ;;
-              *) echo "Game branch may modify only ${frontend_allowed} and ${backend_allowed}; blocked file: ${file}" >&2; exit 1 ;;
+              "$frontend_allowed"* | "$backend_allowed"* | "$backend_tests_allowed"*) ;;
+              *) echo "Game branch may modify only ${frontend_allowed}, ${backend_allowed}, and ${backend_tests_allowed}; blocked file: ${file}" >&2; exit 1 ;;
             esac
           done
 

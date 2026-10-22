@@ -46,4 +46,6 @@ public class ScoreService {
     }
     return leaderboard;
   }
+
+  public void resetLeaderboard() { scores.deleteAll(); events.publishEvent(new LeaderboardUpdatedEvent(List.of())); }
 }
