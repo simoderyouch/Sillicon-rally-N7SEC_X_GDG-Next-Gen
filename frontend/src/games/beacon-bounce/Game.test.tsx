@@ -27,9 +27,9 @@ describe("beacon-bounce game", () => {
     revealRoute(); tap("Sun", "Rose", "Mint");
     revealRoute(); tap("Violet", "Ember", "Lime");
     revealRoute(); tap("Pearl", "Sun", "Plum", "Rose");
-    revealRoute(); tap("Mint", "Violet", "Apricot", "Ember");
-    revealRoute(); tap("Lime", "Pearl", "Rose", "Plum", "Sun");
-    revealRoute(); tap("Apricot", "Mint", "Ember", "Violet", "Lime", "Pearl");
+    revealRoute(); tap("Mint", "Violet", "Apricot", "Ember", "Sun", "Plum");
+    revealRoute(); tap("Lime", "Pearl", "Rose", "Plum", "Sun", "Mint", "Violet");
+    revealRoute(); tap("Apricot", "Mint", "Ember", "Violet", "Lime", "Pearl", "Sun", "Plum", "Rose");
     fireEvent.click(screen.getByRole("button", { name: /dispatch result/i }));
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ score: 100, completed: true, details: expect.objectContaining({ roundsCleared: 6, hintsUsed: 0, incorrectSequences: 0 }) }));
   });
