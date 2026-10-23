@@ -1,41 +1,40 @@
 # Cyber Word Scramble
 
-Mission à enregistrer et publier par le responsable plateforme :
+Mission : `word-scramble`, titre **Cyber Word Scramble**, maximum **100 points**, état **PUBLISHED**. Route officielle : `/games/word-scramble`.
 
-- Slug : `word-scramble`
-- Titre : Cyber Word Scramble
-- Description : Retrouvez 10 mots anglais de la cybersécurité avec seulement 3 indices partagés entre tous les mots.
-- Score maximum : **100**
+## Règles
 
-Le jeu est découvert automatiquement via son export `game`. Les autres jeux, le registre, les routes et le backend ne sont pas modifiés. Le bouton final utilise exclusivement `onComplete({ score, completed, details })`. Le runner de la plateforme enregistre le score de l’équipe connectée, après publication de la mission.
+Les dix mots du brief sont mélangés à chaque première partie. Les réponses ignorent la casse et les espaces de début/fin. Une réponse vide ne consomme aucun essai.
 
-Les dix mots et leurs indices sont ceux du brief. L’ordre des mots et leurs lettres sont mélangés à chaque nouvelle partie ; aucun mélange n’est identique au mot attendu. Les réponses ignorent la casse et les espaces de début/fin. Aucun passage de mot n’est possible sans réponse correcte.
+- Trois essais maximum par mot : la troisième réponse incorrecte termine ce mot avec zéro point et passe automatiquement au suivant, sans révéler le mot attendu.
+- Une bonne réponse rapporte 10 points sans erreur/indice, 7 avec indice seul, 5 après une ou deux erreurs sans indice, 3 avec indice et erreur(s).
+- Trois indices partagés entre tous les mots, au maximum un par mot. Aucun indice n'est restitué lorsqu'un mot échoue.
+- Les mots réussis et échoués comptent tous dans les dix mots à traiter. Le score maximum reste 100. Le jeu se termine même si les dix mots ont échoué.
+- L'écran final affiche seulement le score et le bouton de transmission : aucune liste de solutions, aucun bilan détaillé et aucun bouton pour recommencer.
 
-Un mot vaut 10 points sans erreur/indice, 7 avec indice seul, 5 avec erreur(s) seule(s), 3 avec les deux. Plusieurs erreurs n’ajoutent pas de déduction. L’indice ne peut être consommé qu’une fois par mot et seuls trois mots peuvent en bénéficier. Le score est calculé à partir des mots résolus.
+## Persistance et blocage après transmission
 
-La partie (ordre, erreurs, indices et état d’envoi) est conservée dans `localStorage`, par mission et session d’équipe. Un rafraîchissement ou une sortie/retour ne restitue pas les indices. Les actions relisent la sauvegarde avant modification et les onglets reçoivent les changements via l’événement `storage`. Une nouvelle partie explicitement confirmée remet la progression, le score et les indices à zéro. Si le stockage est indisponible, le jeu affiche une erreur au lieu de continuer sans sauvegarde.
+Les essais, indices et mots déjà traités sont conservés dans `localStorage`, par mission et session. Les sauvegardes existantes restent lisibles ; un ancien mot non résolu avec au moins trois erreurs devient un mot échoué. Les résultats déjà transmis ne sont pas recalculés.
 
-Le callback est déclenché au maximum une fois par partie, y compris après un rechargement. L’état envoyé est enregistré avant le callback ; cela empêche un second envoi depuis le jeu, mais ne confirme pas la réussite réseau. Le runner affiche les éventuelles erreurs serveur. Le jeu n’ajoute pas de requête de score indépendante.
+La plateforme vérifie la participation via un endpoint privé dans le package `com.silliconrally.api.games.word_scramble` :
 
-Cette persistance protège contre les rechargements ordinaires, pas contre une modification/effacement volontaire du stockage, un changement de navigateur ou des actions parfaitement simultanées dans plusieurs onglets. Le jeu pédagogique ne contient pas de secret ; une validation compétitive inviolable nécessiterait un état côté serveur et un contrat d’envoi idempotent géré par la plateforme.
+- `GET /api/v1/games/word-scramble/completion`
+- `POST /api/v1/games/word-scramble/completion` avec `{ score }`
 
-## Essayer en local
+Le token existant `X-Team-Token` est résolu en véritable équipe. Les UUID de mission et d'équipe identifient un verrou Redis permanent, réservé atomiquement avec SET NX. Les scores déjà présents dans `game_scores` verrouillent aussi la mission, y compris les participations antérieures à cette mise à jour. Les lectures en base servent uniquement à vérifier le statut : l'endpoint privé ne crée ni ne modifie de score.
 
-Depuis `frontend` :
+Une équipe ayant réservé/transmis son résultat retrouve son score après rechargement, renouvellement de session ou changement de navigateur. Aucun bouton de rejeu, de remise à zéro ou de réactivation d'envoi n'est exposé. La vérification périodique synchronise les autres onglets. Un jeu déjà soumis dans la sauvegarde locale est également bloqué.
 
-```powershell
-npm.cmd run dev
-```
+Le premier appel autorisé utilise toujours `onComplete`. Le `GameRunner` commun enregistre le résultat et gère la navigation. Les détails comprennent `wordsSolved`, `wordsFailed`, `hintsUsed`, `incorrectAttempts` et `rawScore`. Aucun appel direct au endpoint commun de score n'est ajouté.
 
-Ouvrir `http://localhost:5173/src/games/word-scramble/preview.html`. L’aperçu sauvegarde la partie localement, affiche le résultat final, et n’envoie aucun score au serveur. Utiliser « Nouvelle partie » pour repartir avec 3 indices. L’entrée d’aperçu n’est pas incluse dans la production.
+Comme pour les transmissions à usage unique du projet, une interruption réseau entre la réservation privée et le callback peut nécessiter une intervention de l'organisateur. Une reprise avec garantie de livraison exactement une fois nécessiterait l'idempotence du système de score partagé. Ce verrou empêche le rejeu dans le parcours normal ; le calcul des réponses reste côté navigateur et le endpoint de score partagé n'est pas modifié pour bloquer les appels forgés.
 
-## Vérification
+Le backend et Redis doivent être relancés avec cette mise à jour pour jouer sur la plateforme. Les essais en cours restent sauvegardés localement ; leur stockage n'est pas un mécanisme anti-triche inviolable avant transmission.
 
-Depuis `frontend` :
+## Aperçu et vérification
 
-```powershell
-npm.cmd test -- src/games/word-scramble/Game.test.tsx
-npm.cmd run build
-```
+Depuis `frontend`, `npm.cmd run dev`, puis `http://localhost:5173/src/games/word-scramble/preview.html`. Sans session, cet aperçu n'enregistre aucun score réel ; il conserve sa partie locale et ne propose pas de remise à zéro.
 
-Le contrôle complet du dépôt est `scripts/check.sh` dans un environnement POSIX avec Node et Maven.
+Tests frontend : `npm.cmd test -- src/games/word-scramble/Game.test.tsx`, puis `npm.cmd run build`.
+
+Tests backend : `mvn test`. Tests dédiés dans `backend/src/test/java/com/silliconrally/api/games/word_scramble/`, dossier autorisé par la CI.
