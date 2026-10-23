@@ -17,7 +17,7 @@ afterEach(() => { cleanup(); sessionStorage.clear(); vi.unstubAllGlobals(); });
 describe("beacon-bounce game", () => {
   it("uses a server-created route and verifies each beacon through the private endpoint", async () => {
     const fetchMock = vi.fn()
-      .mockReturnValueOnce(response({ runId: "run-1", routes, round: 0, securedScore: 0, failed: false, complete: false }))
+      .mockReturnValueOnce(response({ runId: "run-1", routes, round: 0, securedScore: 0, hintsUsed: 0, hintsRemaining: 3, failed: false, complete: false }))
       .mockReturnValueOnce(response({ correct: true, roundCleared: false, failed: false, complete: false, securedScore: 0, nextRound: 0 }));
     vi.stubGlobal("fetch", fetchMock);
     const Component = game.component;
@@ -32,7 +32,7 @@ describe("beacon-bounce game", () => {
 
   it("does not offer a replay after failure and requires dispatching the verified score", async () => {
     vi.stubGlobal("fetch", vi.fn()
-      .mockReturnValueOnce(response({ runId: "run-2", routes, round: 1, securedScore: 8, failed: false, complete: false }))
+      .mockReturnValueOnce(response({ runId: "run-2", routes, round: 1, securedScore: 8, hintsUsed: 0, hintsRemaining: 3, failed: false, complete: false }))
       .mockReturnValueOnce(response({ correct: false, roundCleared: false, failed: true, complete: false, securedScore: 8, nextRound: 1 })));
     const onComplete = vi.fn();
     const Component = game.component;
@@ -45,5 +45,21 @@ describe("beacon-bounce game", () => {
     expect(screen.queryByRole("button", { name: /start again/i })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /dispatch result/i }));
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ score: 8, completed: false, details: expect.objectContaining({ serverVerified: true, roundsCleared: 1 }) }));
+  });
+
+  it("replaces the active route after recording a two-times-round-points penalty", async () => {
+    const fetchMock = vi.fn()
+      .mockReturnValueOnce(response({ runId: "run-3", routes, round: 0, securedScore: 0, hintsUsed: 0, hintsRemaining: 3, failed: false, complete: false }))
+      .mockReturnValueOnce(response({ route: ["rose", "mint", "sun"], penalty: 16, securedScore: 0, hintsUsed: 1, hintsRemaining: 2 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const Component = game.component;
+    render(<Component mission={mission} onComplete={vi.fn()} />);
+
+    await waitFor(() => expect(screen.getByRole("button", { name: /show competition route/i })).toBeEnabled());
+    await showRoute();
+    await waitFor(() => expect(screen.getByRole("button", { name: /new route/i })).toBeEnabled(), { timeout: 4_000 });
+    fireEvent.click(screen.getByRole("button", { name: /new route/i }));
+    await waitFor(() => expect(fetchMock).toHaveBeenLastCalledWith("http://localhost:8080/api/v1/games/beacon-bounce/hint", expect.objectContaining({ method: "POST", body: JSON.stringify({ runId: "run-3", round: 0 }) })));
+    expect(screen.queryByRole("button", { name: /new route/i })).not.toBeInTheDocument();
   });
 });
