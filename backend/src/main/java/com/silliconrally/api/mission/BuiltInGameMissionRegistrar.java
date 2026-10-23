@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class BuiltInGameMissionRegistrar {
   private static final List<GameMission> BUILT_IN_GAMES = List.of(
+      new GameMission("intake", "Mission Intake", "Triage a suspicious message and choose the safest response.", 100),
       new GameMission("beacon-bounce", "Beacon Bounce", "Memorise an accelerating beacon route and repeat it exactly.", 100),
       new GameMission("code-breaker", "Code Breaker", "Use deduction clues to crack three team-specific code sequences.", 100),
       new GameMission("parcel-panic", "Parcel Panic", "Route every incoming parcel to the delivery depot with the matching stamp.", 100)

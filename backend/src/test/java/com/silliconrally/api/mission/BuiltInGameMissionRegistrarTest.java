@@ -21,10 +21,11 @@ class BuiltInGameMissionRegistrarTest {
 
     registrar.registerMissingGames();
 
-    verify(missions, org.mockito.Mockito.times(3)).save(saved.capture());
+    verify(missions, org.mockito.Mockito.times(4)).save(saved.capture());
     assertThat(saved.getAllValues())
         .extracting(Mission::getSlug, Mission::getTitle, Mission::getMaxScore, Mission::getReleaseState)
         .containsExactlyInAnyOrder(
+            org.assertj.core.groups.Tuple.tuple("intake", "Mission Intake", 100, MissionReleaseState.DRAFT),
             org.assertj.core.groups.Tuple.tuple("beacon-bounce", "Beacon Bounce", 100, MissionReleaseState.DRAFT),
             org.assertj.core.groups.Tuple.tuple("code-breaker", "Code Breaker", 100, MissionReleaseState.DRAFT),
             org.assertj.core.groups.Tuple.tuple("parcel-panic", "Parcel Panic", 100, MissionReleaseState.DRAFT));
@@ -33,12 +34,13 @@ class BuiltInGameMissionRegistrarTest {
   @Test
   void neverOverwritesExistingAdminManagedGameMissions() {
     when(missions.findBySlug("beacon-bounce")).thenReturn(Optional.of(new Mission("beacon-bounce", "Custom title", "Custom description", 250, MissionReleaseState.PUBLISHED)));
+    when(missions.findBySlug("intake")).thenReturn(Optional.empty());
     when(missions.findBySlug("code-breaker")).thenReturn(Optional.empty());
     when(missions.findBySlug("parcel-panic")).thenReturn(Optional.empty());
 
     registrar.registerMissingGames();
 
     verify(missions, never()).save(org.mockito.ArgumentMatchers.argThat(mission -> mission.getSlug().equals("beacon-bounce")));
-    verify(missions, org.mockito.Mockito.times(2)).save(any(Mission.class));
+    verify(missions, org.mockito.Mockito.times(3)).save(any(Mission.class));
   }
 }
