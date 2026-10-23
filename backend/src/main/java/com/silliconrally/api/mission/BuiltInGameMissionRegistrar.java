@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Registers shipped game modules without changing missions that an admin already manages. */
+/** Registers visible shipped game modules without changing missions that an admin already manages. */
 @Service
 @Transactional
 public class BuiltInGameMissionRegistrar {
@@ -27,11 +27,11 @@ public class BuiltInGameMissionRegistrar {
     this.missions = missions;
   }
 
-  /** Missing built-in games are added as drafts; existing manual release settings always win. */
+  /** Missing built-in games are published; existing manual release settings always win. */
   public void registerMissingGames() {
     for (GameMission game : BUILT_IN_GAMES) {
       if (missions.findBySlug(game.slug()).isEmpty()) {
-        missions.save(new Mission(game.slug(), game.title(), game.description(), game.maxScore(), MissionReleaseState.DRAFT));
+        missions.save(new Mission(game.slug(), game.title(), game.description(), game.maxScore(), MissionReleaseState.PUBLISHED));
       }
     }
   }

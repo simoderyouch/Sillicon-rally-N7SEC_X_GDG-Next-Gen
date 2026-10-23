@@ -52,9 +52,9 @@ The existing services were observed running at 5173 and 8080. `GET http://localh
 
 ## Automatic registration and release
 
-The platform creates the Pac-Man mission as a `DRAFT` when it starts. The startup registrar creates it only when it is absent and never changes an existing administrator-managed mission. No separate registration command, migration, or manual creation is required.
+The platform creates the Pac-Man mission as `PUBLISHED` when it starts, so it is immediately available to players. The startup registrar creates it only when it is absent and never changes an existing administrator-managed mission. No separate registration command or manual creation is required.
 
-Open `/admin`, sign in with the backend's configured `ADMIN_EMAIL` and `ADMIN_PASSWORD` (login exchanges these for an opaque Redis session token), then publish the generated Pac-Man draft when the event is ready. The fields below document the generated record and are only needed to recover a missing record manually:
+Open `/admin`, sign in with the backend's configured `ADMIN_EMAIL` and `ADMIN_PASSWORD` (login exchanges these for an opaque Redis session token). The fields below document the generated record and are only needed to recover a missing record manually:
 
 - Slug: `pacman`
 - Title: `Pac-Man Challenge`
