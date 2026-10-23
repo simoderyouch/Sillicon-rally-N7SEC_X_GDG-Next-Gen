@@ -59,6 +59,6 @@ Avoid adding game state to the global application. Keep timers, answer selection
 
 ## Mission registration
 
-Built-in games are registered automatically as **published** missions when the platform starts: Mission Intake, Beacon Bounce, Code Breaker, Parcel Panic, Phishing Detective, Pac-Man Challenge, and Cyber Word Scramble. They are immediately visible to players. The registrar only creates missing records: it never overwrites an admin's title, description, maximum score, or release state.
+Built-in games are registered automatically as **published** missions when the platform starts: Beacon Bounce, Code Breaker, Phishing Detective, Pac-Man Challenge, and Cyber Word Scramble. They are immediately visible to players. The registrar only creates missing records: it never overwrites an admin's title, description, maximum score, or release state.
 
 When integrating another built-in game, add its slug, title, player-facing description, and maximum score to `BuiltInGameMissionRegistrar`. Use a Flyway migration only when an already deployed built-in game's release state must change. The Admin Shell can still close or edit a generated game, and its manual form remains available for custom or non-game challenges.

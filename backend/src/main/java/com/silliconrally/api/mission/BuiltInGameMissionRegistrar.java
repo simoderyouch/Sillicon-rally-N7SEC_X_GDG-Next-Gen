@@ -12,10 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class BuiltInGameMissionRegistrar {
   private static final List<GameMission> BUILT_IN_GAMES = List.of(
-      new GameMission("intake", "Mission Intake", "Triage a suspicious message and choose the safest response.", 100),
       new GameMission("beacon-bounce", "Beacon Bounce", "Memorise an accelerating beacon route and repeat it exactly.", 100),
       new GameMission("code-breaker", "Code Breaker", "Use deduction clues to crack three team-specific code sequences.", 100),
-      new GameMission("parcel-panic", "Parcel Panic", "Route every incoming parcel to the delivery depot with the matching stamp.", 100),
       new GameMission("cyber-awareness-hub", "Phishing Detective — Can You Spot the Threat?", "Analysez 12 e-mails, URL et pages de connexion. Inspectez les détails, identifiez les tentatives de phishing et consultez votre rapport personnalisé.", 100),
       new GameMission("pacman", "Pac-Man Challenge", "Collect points, avoid ghosts, and achieve the highest score in five minutes.", 100),
       new GameMission("word-scramble", "Cyber Word Scramble", "Retrouvez 10 mots anglais de la cybersécurité avec seulement 3 indices partagés entre tous les mots.", 100)
