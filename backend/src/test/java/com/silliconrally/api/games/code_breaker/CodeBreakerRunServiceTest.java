@@ -30,7 +30,7 @@ class CodeBreakerRunServiceTest {
     CodeBreakerRunService service = new CodeBreakerRunService(redis, new ObjectMapper());
     UUID team = UUID.randomUUID();
     CodeBreakerPuzzle puzzle = new CodeBreakerPuzzle();
-    List<String> wrongCode = wrongCode(puzzle, team, 0);
+    List<String> wrongCode = wrongCode(puzzle, 0);
 
     assertThat(service.start(team).attemptsRemaining()).isEqualTo(7);
     CodeBreakerRunService.AttemptResponse last = null;
@@ -45,13 +45,13 @@ class CodeBreakerRunServiceTest {
       .isInstanceOf(ResponseStatusException.class)
       .hasMessageContaining("not the active");
 
-    for (int attempt = 0; attempt < 6; attempt += 1) service.attempt(team, 1, wrongCode(puzzle, team, 1));
-    for (int attempt = 0; attempt < 4; attempt += 1) service.attempt(team, 2, wrongCode(puzzle, team, 2));
+    for (int attempt = 0; attempt < 6; attempt += 1) service.attempt(team, 1, wrongCode(puzzle, 1));
+    for (int attempt = 0; attempt < 4; attempt += 1) service.attempt(team, 2, wrongCode(puzzle, 2));
     assertThat(service.verifiedResult(team)).extracting(CodeBreakerRunService.VerifiedResult::score, CodeBreakerRunService.VerifiedResult::completed).containsExactly(0, true);
   }
 
-  private List<String> wrongCode(CodeBreakerPuzzle puzzle, UUID team, int round) {
-    List<String> guess = new java.util.ArrayList<>(puzzle.answerFor(team, round));
+  private List<String> wrongCode(CodeBreakerPuzzle puzzle, int round) {
+    List<String> guess = new java.util.ArrayList<>(puzzle.answerFor(round));
     guess.set(0, guess.get(0).equals("comet") ? "orbit" : "comet");
     return guess;
   }

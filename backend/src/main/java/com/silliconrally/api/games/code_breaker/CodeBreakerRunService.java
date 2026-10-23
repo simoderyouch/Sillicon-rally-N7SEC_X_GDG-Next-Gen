@@ -52,7 +52,7 @@ public class CodeBreakerRunService {
     if (run.complete()) throw new ResponseStatusException(CONFLICT, "This Code Breaker run has already ended");
     if (round != run.round()) throw new ResponseStatusException(CONFLICT, "This is not the active Code Breaker round");
 
-    List<String> answer = puzzle.answerFor(teamId, round);
+    List<String> answer = puzzle.answerFor(round);
     CodeBreakerPuzzle.Feedback feedback = puzzle.evaluate(symbols, answer);
     int attemptsUsed = run.attemptsUsed() + 1;
     boolean roundCleared = feedback.exact() == answer.size();
@@ -87,7 +87,7 @@ public class CodeBreakerRunService {
     if (run.complete()) throw new ResponseStatusException(CONFLICT, "This Code Breaker run has already ended");
     if (round != run.round()) throw new ResponseStatusException(CONFLICT, "This is not the active Code Breaker round");
     if (run.hintUsed()) throw new ResponseStatusException(CONFLICT, "This round's hint has already been used");
-    List<String> answer = puzzle.answerFor(teamId, round);
+    List<String> answer = puzzle.answerFor(round);
     if (position < 0 || position >= answer.size()) throw new ResponseStatusException(CONFLICT, "This position is outside the code");
     save(teamId, new Run(run.round(), run.attemptsUsed(), run.securedScore(), run.roundsCleared(), true, false));
     return new HintResponse(position, answer.get(position));

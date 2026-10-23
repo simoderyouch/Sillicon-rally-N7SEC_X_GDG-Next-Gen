@@ -2,31 +2,25 @@ package com.silliconrally.api.games.code_breaker;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SplittableRandom;
-import java.util.UUID;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
-/** Stateless, deterministic team puzzle generator. No answer is sent to the browser. */
+/** Stateless fixed puzzle. No answer is sent to the browser. */
 public final class CodeBreakerPuzzle {
   private static final List<String> SYMBOLS = List.of("comet", "orbit", "spark", "leaf", "wave", "cube", "moon", "bolt");
   private static final int[] LENGTHS = {3, 3, 5};
+  private static final List<List<String>> ANSWERS = List.of(
+    List.of("comet", "orbit", "spark"),
+    List.of("spark", "moon", "orbit"),
+    List.of("moon", "bolt", "moon", "leaf", "orbit")
+  );
 
   public record Feedback(int exact, int shifted, int absent) { }
 
-  public List<String> answerFor(UUID teamId, int round) {
-    int length = lengthFor(round);
-    long seed = teamId.getMostSignificantBits() ^ Long.rotateLeft(teamId.getLeastSignificantBits(), 19) ^ (0x9E3779B97F4A7C15L * (round + 1L));
-    SplittableRandom random = new SplittableRandom(seed);
-    List<String> answer = new ArrayList<>();
-    while (answer.size() < length) {
-      String symbol = SYMBOLS.get(random.nextInt(SYMBOLS.size()));
-      // The first two rounds are approachable; the final code may contain repeated symbols.
-      if (round < 2 && answer.contains(symbol)) continue;
-      answer.add(symbol);
-    }
-    return List.copyOf(answer);
+  public List<String> answerFor(int round) {
+    lengthFor(round);
+    return ANSWERS.get(round);
   }
 
   public Feedback evaluate(List<String> guess, List<String> answer) {

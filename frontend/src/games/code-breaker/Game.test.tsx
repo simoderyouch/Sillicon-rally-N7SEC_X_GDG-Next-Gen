@@ -22,7 +22,7 @@ beforeEach(() => { sessionStorage.setItem("teamToken", "team-token"); });
 afterEach(() => { cleanup(); sessionStorage.clear(); vi.unstubAllGlobals(); });
 
 describe("code-breaker game", () => {
-  it("reports the server-verified full score after cracking all three team codes", async () => {
+  it("reports the server-verified full score after cracking all three fixed codes", async () => {
     const fetchMock = vi.fn()
       .mockReturnValueOnce(response(startRun))
       .mockReturnValueOnce(response({ exact: 3, shifted: 0, absent: 0, correct: true, roundCleared: true, roundFailed: false, complete: false, securedScore: 20, roundsCleared: 1, nextRound: 1, attemptsRemaining: 6 }))
@@ -41,7 +41,7 @@ describe("code-breaker game", () => {
     fireEvent.click(screen.getByRole("button", { name: /dispatch result/i }));
 
     expect(fetchMock).toHaveBeenCalledTimes(4);
-    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ score: 100, completed: true, details: expect.objectContaining({ roundsCleared: 3, guesses: 3, teamSpecificCodes: true, serverVerified: true }) }));
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ score: 100, completed: true, details: expect.objectContaining({ roundsCleared: 3, guesses: 3, fixedCodes: true, serverVerified: true }) }));
   });
 
   it("shows exact, shifted, and absent feedback from the team puzzle endpoint", async () => {
@@ -58,7 +58,7 @@ describe("code-breaker game", () => {
     expect(screen.getByText("1 absent")).toBeInTheDocument();
   });
 
-  it("shows a team-specific hint returned by the endpoint", async () => {
+  it("shows a server-provided hint returned by the endpoint", async () => {
     vi.stubGlobal("fetch", vi.fn()
       .mockReturnValueOnce(response(startRun))
       .mockReturnValueOnce(response({ position: 0, symbol: "orbit" })));
