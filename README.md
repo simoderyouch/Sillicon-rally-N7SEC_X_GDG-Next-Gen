@@ -16,20 +16,17 @@ New implementation of the team cybersecurity game: React frontend, Spring Boot b
 
 ```bash
 cp .env.example .env
-docker compose up -d postgres redis
-
-cd backend
-ADMIN_EMAIL=admin@sillicon-rally.local ADMIN_PASSWORD=admin-gdg \
-SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/sillicon_rally \
-SPRING_DATASOURCE_USERNAME=sillicon SPRING_DATASOURCE_PASSWORD=change-me \
-mvn spring-boot:run
-
-cd ../frontend
-npm install
-npm run dev
+docker compose up --build -d
 ```
 
-The frontend starts on `http://localhost:5173`; the API starts on `http://localhost:8080`.
+The whole application is containerized: React/Nginx frontend, Spring Boot API,
+PostgreSQL, and Redis. Open `http://localhost:5173`; the frontend proxies `/api`
+and `/ws` to the API container, so browser traffic remains same-origin. Follow
+startup with `docker compose logs -f`, and stop the stack with `docker compose down`.
+
+Persistent PostgreSQL and Redis data are retained in named Docker volumes. To reset
+the local environment completely, run `docker compose down -v` (this deletes all
+local event data).
 
 ## Shared event sessions
 
@@ -77,4 +74,5 @@ The generator creates an isolated frontend game folder and an optional private v
 ```text
 frontend/  React + Vite + TypeScript
 backend/   Spring Boot + JPA + Flyway
+docker-compose.yml  Full local infrastructure stack
 ```
