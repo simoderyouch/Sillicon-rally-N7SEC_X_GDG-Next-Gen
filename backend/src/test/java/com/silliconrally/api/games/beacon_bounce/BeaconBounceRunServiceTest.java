@@ -45,7 +45,7 @@ class BeaconBounceRunServiceTest {
   }
 
   @Test
-  void allows_one_route_replay_and_deducts_its_penalty_when_the_round_is_cleared() {
+  void replaces_the_active_route_up_to_three_times_and_tracks_the_full_penalty() {
     StringRedisTemplate redis = org.mockito.Mockito.mock(StringRedisTemplate.class);
     @SuppressWarnings("unchecked") ValueOperations<String, String> values = org.mockito.Mockito.mock(ValueOperations.class);
     AtomicReference<String> stored = new AtomicReference<>();
@@ -57,11 +57,17 @@ class BeaconBounceRunServiceTest {
     UUID team = UUID.randomUUID();
     BeaconBounceRunService.StartResponse run = service.start(team);
 
-    assertThat(service.hint(team, run.runId(), 0).penalty()).isEqualTo(2);
-    assertThatThrownBy(() -> service.hint(team, run.runId(), 0)).isInstanceOf(ResponseStatusException.class).hasMessageContaining("already been used");
-    for (String beacon : run.routes().get(0)) service.attempt(team, run.runId(), 0, beacon);
+    BeaconBounceRunService.HintResponse first = service.hint(team, run.runId(), 0);
+    BeaconBounceRunService.HintResponse second = service.hint(team, run.runId(), 0);
+    BeaconBounceRunService.HintResponse third = service.hint(team, run.runId(), 0);
 
-    assertThat(service.start(team).securedScore()).isEqualTo(6);
-    assertThat(service.start(team).hintUsed()).isFalse();
+    assertThat(first.route()).isNotEqualTo(run.routes().get(0));
+    assertThat(second.route()).isNotEqualTo(first.route());
+    assertThat(third.route()).isNotEqualTo(second.route());
+    assertThat(third).extracting(BeaconBounceRunService.HintResponse::penalty, BeaconBounceRunService.HintResponse::hintsUsed, BeaconBounceRunService.HintResponse::hintsRemaining).containsExactly(16, 3, 0);
+    assertThatThrownBy(() -> service.hint(team, run.runId(), 0)).isInstanceOf(ResponseStatusException.class).hasMessageContaining("All three");
+    for (String beacon : third.route()) service.attempt(team, run.runId(), 0, beacon);
+
+    assertThat(service.start(team)).extracting(BeaconBounceRunService.StartResponse::securedScore, BeaconBounceRunService.StartResponse::hintsUsed, BeaconBounceRunService.StartResponse::hintsRemaining).containsExactly(0, 3, 0);
   }
 }

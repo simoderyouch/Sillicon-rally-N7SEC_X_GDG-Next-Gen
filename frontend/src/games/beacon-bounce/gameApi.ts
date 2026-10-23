@@ -1,8 +1,8 @@
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.DEV ? "http://localhost:8080" : "");
 
-export type BeaconRun = { runId: string; routes: string[][]; round: number; securedScore: number; hintUsed: boolean; failed: boolean; complete: boolean };
+export type BeaconRun = { runId: string; routes: string[][]; round: number; securedScore: number; hintsUsed: number; hintsRemaining: number; failed: boolean; complete: boolean };
 export type BeaconAttempt = { correct: boolean; roundCleared: boolean; failed: boolean; complete: boolean; securedScore: number; nextRound: number };
-export type BeaconHint = { penalty: number };
+export type BeaconHint = { route: string[]; penalty: number; securedScore: number; hintsUsed: number; hintsRemaining: number };
 
 async function request<T>(path: string, token: string, init: RequestInit = {}): Promise<T> {
   const response = await fetch(`${apiBaseUrl}${path}`, { ...init, headers: { "Content-Type": "application/json", "X-Team-Token": token, ...init.headers } });
