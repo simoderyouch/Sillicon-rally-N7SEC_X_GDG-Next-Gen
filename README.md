@@ -28,6 +28,10 @@ Persistent PostgreSQL and Redis data are retained in named Docker volumes. To re
 the local environment completely, run `docker compose down -v` (this deletes all
 local event data).
 
+For an OpenShip deployment behind `https://silicon-rally.edder.studio`, read
+[docs/OPENSHIP_DEPLOYMENT.md](docs/OPENSHIP_DEPLOYMENT.md). It documents the
+required trusted HTTPS origin and proxy-header chain for API and WebSocket traffic.
+
 ## Shared event sessions
 
 Opaque team and admin tokens are stored in Redis with a 12-hour expiry, so any API instance can serve a client behind the load balancer. They remain browser-held tokens for this local-network event; use HTTPS, restricted LAN access, strong admin credentials, rate limits, hashed team join codes, and secure HTTP-only sessions (or an approved identity provider) for an internet-facing deployment.
