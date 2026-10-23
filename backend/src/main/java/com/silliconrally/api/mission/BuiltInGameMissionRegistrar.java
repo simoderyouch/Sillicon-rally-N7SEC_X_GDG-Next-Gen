@@ -28,6 +28,7 @@ public class BuiltInGameMissionRegistrar {
   private final MissionRepository missions;
   private final List<String> gameSlugs;
 
+  @org.springframework.beans.factory.annotation.Autowired
   public BuiltInGameMissionRegistrar(MissionRepository missions, ResourceLoader resources) {
     this(missions, readCatalog(resources));
   }
