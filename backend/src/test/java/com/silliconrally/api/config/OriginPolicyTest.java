@@ -16,7 +16,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistration;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
-import org.springframework.web.socket.handler.OriginHandshakeInterceptor;
+import org.springframework.web.socket.server.support.OriginHandshakeInterceptor;
 
 class OriginPolicyTest {
   private static final String PRODUCTION_ORIGIN = "https://silicon-rally.edder.studio";
