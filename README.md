@@ -71,6 +71,8 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/GAME_DEVELOPMENT.md](docs/GAME
 
 The generator creates an isolated frontend game folder and an optional private validation-endpoint package. A game completes through a callback; the shared runner submits the score to the locked backend route, so game developers never build, call, or modify scoring endpoints. A private endpoint may validate game-specific answers but cannot record points. Read [frontend/src/games/README.md](frontend/src/games/README.md) before starting a game.
 
+Shipped games are automatically added to the admin mission catalogue as drafts on startup. Admins retain release control, and can still add custom challenges manually.
+
 `frontend/src/games/intake/` is a deliberately small working reference game. It demonstrates the full flow: a game component receives a mission, reports completion through `onComplete`, and the shared runner sends its score to the API. New game teams should copy the template, not edit this reference game.
 
 ## Project structure

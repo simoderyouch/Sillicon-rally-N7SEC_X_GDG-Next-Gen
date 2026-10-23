@@ -1,6 +1,6 @@
 # Cyber Word Scramble
 
-Mission à enregistrer et publier par le responsable plateforme :
+Mission créée automatiquement comme brouillon au démarrage de la plateforme. Le responsable doit seulement la publier dans l’Admin Shell :
 
 - Slug : `word-scramble`
 - Titre : Cyber Word Scramble

@@ -113,14 +113,15 @@ export function AdminDashboard() {
     </div>
     <div className="admin-missions">
       <div className="form-card mission-create-card">
-        <p className="form-kicker">Mission catalogue</p><h2>Add a challenge</h2>
+        <p className="form-kicker">Mission catalogue</p><h2>Add a custom challenge</h2>
+        <p>Built-in games are added automatically as drafts when the platform starts. Use this form for custom or non-game challenges.</p>
         <form onSubmit={submitMission}>
           <label>Slug<input placeholder="for example: log-investigation" value={missionDraft.slug} onChange={(event) => setMissionDraft({ ...missionDraft, slug: event.target.value.toLowerCase() })} /></label>
           <label>Challenge title<input placeholder="Log investigation" value={missionDraft.title} onChange={(event) => setMissionDraft({ ...missionDraft, title: event.target.value })} /></label>
           <label>Short description<input placeholder="What teams will do" value={missionDraft.description} onChange={(event) => setMissionDraft({ ...missionDraft, description: event.target.value })} /></label>
           <label>Point ceiling<input type="number" min="0" max="10000" value={missionDraft.maxScore} onChange={(event) => setMissionDraft({ ...missionDraft, maxScore: Number(event.target.value) })} /></label>
           <label>Release state<select value={missionDraft.releaseState} onChange={(event) => setMissionDraft({ ...missionDraft, releaseState: event.target.value as Mission["releaseState"] })}><option value="DRAFT">Draft</option><option value="PUBLISHED">Published</option><option value="CLOSED">Closed</option></select></label>
-          <button className="button-primary" disabled={createMission.isPending}>Add challenge <span aria-hidden="true">→</span></button>
+          <button className="button-primary" disabled={createMission.isPending}>Add custom challenge <span aria-hidden="true">→</span></button>
         </form>
         {createMission.error && <p className="error" role="alert">{createMission.error.message}</p>}
       </div>

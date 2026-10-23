@@ -2,7 +2,7 @@
 
 Niveau débutant : messages courts en français, adresses faciles à comparer et indices directs (paiement inattendu, code SMS demandé, programme .exe à la place d’un document). Les 12 défis et le calcul du score sur 100 sont conservés. Un rappel des trois réflexes accompagne le joueur sans révéler les réponses.
 
-Mission à enregistrer et publier par le responsable plateforme :
+Mission créée automatiquement comme brouillon au démarrage de la plateforme. Le responsable doit seulement la publier dans l’Admin Shell :
 
 - **Slug :** `cyber-awareness-hub`
 - **Titre :** Phishing Detective — Can You Spot the Threat?

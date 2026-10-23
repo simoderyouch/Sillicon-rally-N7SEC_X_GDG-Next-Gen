@@ -50,11 +50,11 @@ npm run dev
 
 The existing services were observed running at 5173 and 8080. `GET http://localhost:8080/api/v1/missions` returned `[]`. Integration browser testing used a separate Vite port 5174 and an isolated temporary preview, without creating or altering a real mission or team.
 
-## Admin registration (source-verified schema)
+## Automatic registration and release
 
-No mission has been registered by this change; organiser credentials were not supplied. No records, migrations, other missions or event state were changed.
+The platform creates the Pac-Man mission as a `DRAFT` when it starts. The startup registrar creates it only when it is absent and never changes an existing administrator-managed mission. No separate registration command, migration, or manual creation is required.
 
-Open `/admin`, sign in with the backend's configured `ADMIN_EMAIL` and `ADMIN_PASSWORD` (login exchanges these for an opaque Redis session token). In `/admin/dashboard`, use **Add a challenge** with:
+Open `/admin`, sign in with the backend's configured `ADMIN_EMAIL` and `ADMIN_PASSWORD` (login exchanges these for an opaque Redis session token), then publish the generated Pac-Man draft when the event is ready. The fields below document the generated record and are only needed to recover a missing record manually:
 
 - Slug: `pacman`
 - Title: `Pac-Man Challenge`

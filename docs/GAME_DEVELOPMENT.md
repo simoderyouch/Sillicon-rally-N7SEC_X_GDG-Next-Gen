@@ -59,4 +59,6 @@ Avoid adding game state to the global application. Keep timers, answer selection
 
 ## Mission registration
 
-Tell the platform owner the final slug, title, description, and maximum score from your game brief. They register and publish the mission separately. Do not add a Flyway migration. This prevents several game teams from editing the backend skeleton and creating migration conflicts.
+Built-in games are registered automatically as **draft** missions when the platform starts: Mission Intake, Beacon Bounce, Code Breaker, Parcel Panic, Phishing Detective, Pac-Man Challenge, and Cyber Word Scramble. It only creates missing records: it never overwrites an admin's title, description, maximum score, or release state.
+
+When integrating another built-in game, add its slug, title, player-facing description, and maximum score to `BuiltInGameMissionRegistrar`. Do not add a Flyway mission migration. An organiser can then publish or close the generated draft in the Admin Shell. The Admin Shell's manual form remains available for custom or non-game challenges.
