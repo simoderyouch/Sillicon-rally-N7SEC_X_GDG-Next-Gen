@@ -23,15 +23,11 @@ describe('Pac-Man challenge', () => {
     message('ready'); expect(screen.getByRole('button', { name: /Start five/ })).toBeEnabled();
     expect(screen.getByLabelText('Time remaining')).toHaveTextContent('05:00');
   });
-  it('starts once, receives engine scores, retains round-over points and completes exactly once', () => {
+  it('submits the final score immediately when the engine reports game-over', () => {
     const complete = vi.fn(); render(<Component mission={mission} onComplete={complete} />); start();
     advance(1000); message('started'); message('score', 2600); message('round-over', 2600);
-    expect(screen.getByRole('status')).toHaveTextContent('Round over');
-    message('started'); message('score', 3000);
-    expect(screen.getByLabelText('Time remaining')).toHaveTextContent('04:59');
-    advance(299000); expect(screen.getByLabelText('Time remaining')).toHaveTextContent('00:00');
-    message('stopped', 3000);
-    expect(complete).toHaveBeenCalledWith({ score: 30, completed: true, details: { pacmanScore: 3000, durationSeconds: 300 } });
+    expect(screen.getByRole('status')).toHaveTextContent('Challenge complete');
+    expect(complete).toHaveBeenCalledWith({ score: 26, completed: true, details: { pacmanScore: 2600, durationSeconds: 1 } });
     advance(1000); expect(complete).toHaveBeenCalledTimes(1);
   });
   it('rejects foreign senders, origins, stale instances, sequences and malformed scores', () => {
