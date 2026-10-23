@@ -39,7 +39,7 @@ function Game({ mission, onComplete, disabled = false }: GameProps) {
     setRemaining(0);
     setFinished(true);
     callback.current({ score: normalizeScore(current.score, mission.maxScore), completed: true,
-      details: { pacmanScore: current.score, durationSeconds: DURATION_SECONDS } });
+      details: { pacmanScore: current.score, durationSeconds: Math.min(DURATION_SECONDS, Math.max(0, Math.floor((Date.now() - (current.deadline - DURATION_SECONDS * 1000)) / 1000))) } });
   }
   function start() {
     if (!ready || disabled || error || state.current || finished) return;
@@ -89,7 +89,11 @@ function Game({ mission, onComplete, disabled = false }: GameProps) {
       if (!current) return;
       if (['score', 'round-over'].includes(data.type) && data.at < current.deadline && data.at <= Date.now() && data.score >= current.score) {
         if (persist({ ...current, score: data.score })) setScore(data.score);
-        if (data.type === 'round-over') setRoundOver(true);
+        if (data.type === 'round-over') {
+          setRoundOver(true);
+          finish();
+          return;
+        }
       }
       if (data.type === 'started') setRoundOver(false);
       if (data.type === 'stopped' && Date.now() >= current.deadline) finish();

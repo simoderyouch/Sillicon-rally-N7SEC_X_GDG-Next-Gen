@@ -73,7 +73,7 @@ The generator creates an isolated frontend game folder and an optional private v
 
 Shipped games are automatically added to the admin mission catalogue as drafts on startup. Admins retain release control, and can still add custom challenges manually.
 
-`frontend/src/games/intake/` is a deliberately small working reference game. It demonstrates the full flow: a game component receives a mission, reports completion through `onComplete`, and the shared runner sends its score to the API. New game teams should copy the template, not edit this reference game.
+`frontend/src/games/_template/` is the starter module for new games. A game component receives a mission, reports completion through `onComplete`, and the shared runner sends its score to the API.
 
 ## Project structure
 
