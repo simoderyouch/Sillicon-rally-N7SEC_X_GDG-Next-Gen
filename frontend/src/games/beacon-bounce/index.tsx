@@ -25,6 +25,7 @@ function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
   const [activeBeacon, setActiveBeacon] = useState<BeaconId | null>(null);
   const [attempt, setAttempt] = useState<BeaconId[]>([]);
   const [earnedScore, setEarnedScore] = useState(0);
+  const [hintUsed, setHintUsed] = useState(false);
   const [requestError, setRequestError] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [finished, setFinished] = useState(false);
@@ -32,7 +33,7 @@ function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
   useEffect(() => {
     if (!token) { setRequestError("Join a team before opening this challenge."); setPhase("failed"); return; }
     beaconBounceApi.start(token).then((response) => {
-      setRun(response); setRound(response.round); setEarnedScore(response.securedScore);
+      setRun(response); setRound(response.round); setEarnedScore(response.securedScore); setHintUsed(response.hintUsed);
       setPhase(response.failed ? "failed" : response.complete ? "complete" : "ready");
     }).catch((error) => { setRequestError(error instanceof Error ? error.message : "Beacon Bounce could not start."); setPhase("failed"); });
   }, [token]);
@@ -40,15 +41,33 @@ function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
   const currentRound = rounds[round] ?? rounds[rounds.length - 1];
   const route = (run?.routes[round] ?? []) as BeaconId[];
 
-  function showRoute() {
-    if (!run || phase !== "ready" || disabled || finished) return;
-    setAttempt([]); setPhase("showing");
+  function playRoute(clearAttempt: boolean) {
+    if (!run || disabled || finished) return;
+    if (clearAttempt) setAttempt([]);
+    setPhase("showing");
     const pulseDuration = Math.max(175, Math.round(currentRound.pace * .65));
     route.forEach((beaconId, index) => {
       window.setTimeout(() => setActiveBeacon(beaconId), index * currentRound.pace);
       window.setTimeout(() => setActiveBeacon(null), index * currentRound.pace + pulseDuration);
     });
     window.setTimeout(() => { setActiveBeacon(null); setPhase("input"); }, route.length * currentRound.pace);
+  }
+
+  function showRoute() {
+    if (phase !== "ready") return;
+    playRoute(true);
+  }
+
+  async function replayRouteHint() {
+    if (!run || !token || phase !== "input" || hintUsed || disabled || isChecking || finished) return;
+    setIsChecking(true); setRequestError(null);
+    try {
+      await beaconBounceApi.hint(token, run.runId, round);
+      setHintUsed(true);
+      playRoute(false);
+    } catch (error) {
+      setRequestError(error instanceof Error ? error.message : "Beacon Bounce could not replay this route.");
+    } finally { setIsChecking(false); }
   }
 
   async function chooseBeacon(beaconId: BeaconId) {
@@ -61,7 +80,7 @@ function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
       const nextAttempt = [...attempt, beaconId];
       if (!response.roundCleared) { setAttempt(nextAttempt); return; }
       if (response.complete) { setPhase("complete"); return; }
-      setRound(response.nextRound); setAttempt([]); setPhase("ready");
+      setRound(response.nextRound); setAttempt([]); setHintUsed(false); setPhase("ready");
     } catch (error) {
       setRequestError(error instanceof Error ? error.message : "Beacon Bounce could not verify that beacon.");
     } finally { setIsChecking(false); }
@@ -82,7 +101,7 @@ function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
         : phase === "showing"
           ? { eyebrow: `Round ${round + 1} · ${currentRound.points} points`, title: "Watch the route.", body: "The board unlocks after the final beacon fades." }
           : phase === "input"
-            ? { eyebrow: `Round ${round + 1} · ${currentRound.points} points`, title: `${attempt.length} of ${route.length} beacons repeated.`, body: "Choose the next beacon. One wrong tap ends this competition run." }
+            ? { eyebrow: `Round ${round + 1} · ${currentRound.points} points`, title: `${attempt.length} of ${route.length} beacons repeated.`, body: hintUsed ? "Route replay used: 2 points will be deducted if you clear this route. Choose the next beacon." : "Choose the next beacon. One wrong tap ends this competition run." }
             : { eyebrow: `Round ${round + 1} of ${rounds.length} · ${currentRound.points} points`, title: round === 0 ? "Your random route is ready." : "Route cleared.", body: round === 0 ? "Watch the order once, then repeat it exactly. One wrong tap ends the run." : `${earnedScore} points secured. The next random route plays faster.` };
 
   return <section className="game-shell beacon-bounce">
@@ -93,6 +112,7 @@ function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
         <div className={`beacon-bounce-round-message is-${phase}`} aria-live="polite"><span>{message.eyebrow}</span><strong>{message.title}</strong><p>{message.body}</p></div>
         <div className="beacon-bounce-grid" aria-label="Beacon route board">{beacons.map((beacon) => <button key={beacon.id} type="button" className={`beacon beacon-${beacon.id} ${activeBeacon === beacon.id ? "is-lit" : ""} ${attempt.includes(beacon.id) && phase === "input" ? "is-picked" : ""}`} aria-label={`Beacon ${beacon.name}`} disabled={phase !== "input" || disabled || isChecking || finished} onClick={() => chooseBeacon(beacon.id)}><beacon.icon aria-hidden="true" strokeWidth={1.7} /><small>{beacon.name}</small></button>)}</div>
         {phase !== "failed" && phase !== "complete" && <button type="button" className="beacon-bounce-show" disabled={phase !== "ready" || disabled || finished || !run} onClick={showRoute}>{phase === "loading" ? "Loading route" : round === 0 ? "Show competition route" : "Show next route"} <span aria-hidden="true">↗</span><small>{route.length ? `${currentRound.label} · ${route.length} beacons · ${currentRound.points} points` : "Server verified"}</small></button>}
+        {phase === "input" && <div className="beacon-bounce-console"><div className="beacon-bounce-help"><span>Missed the route?</span><small>{hintUsed ? "Replay used for this route." : "Replay this route once; 2 points are deducted if you clear it."}</small><button type="button" className="beacon-bounce-hint" onClick={replayRouteHint} disabled={hintUsed || disabled || isChecking || finished}>Replay route <b>−2 pts</b></button></div></div>}
       </div>
       {requestError && <p className="code-breaker-error" role="alert">{requestError}</p>}
     </div>

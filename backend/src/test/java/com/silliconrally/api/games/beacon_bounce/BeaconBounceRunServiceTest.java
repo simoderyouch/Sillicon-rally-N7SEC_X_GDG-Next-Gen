@@ -43,4 +43,25 @@ class BeaconBounceRunServiceTest {
     assertThat(service.verifiedResult(team)).extracting(BeaconBounceRunService.VerifiedResult::score, BeaconBounceRunService.VerifiedResult::completed).containsExactly(0, false);
     assertThatThrownBy(() -> service.attempt(team, run.runId(), 0, wrong)).isInstanceOf(ResponseStatusException.class).hasMessageContaining("already ended");
   }
+
+  @Test
+  void allows_one_route_replay_and_deducts_its_penalty_when_the_round_is_cleared() {
+    StringRedisTemplate redis = org.mockito.Mockito.mock(StringRedisTemplate.class);
+    @SuppressWarnings("unchecked") ValueOperations<String, String> values = org.mockito.Mockito.mock(ValueOperations.class);
+    AtomicReference<String> stored = new AtomicReference<>();
+    when(redis.opsForValue()).thenReturn(values);
+    when(values.get(anyString())).thenAnswer(invocation -> stored.get());
+    when(values.setIfAbsent(anyString(), anyString(), any(Duration.class))).thenAnswer(invocation -> { stored.set(invocation.getArgument(1)); return true; });
+    doAnswer(invocation -> { stored.set(invocation.getArgument(1)); return null; }).when(values).set(anyString(), anyString(), any(Duration.class));
+    BeaconBounceRunService service = new BeaconBounceRunService(redis, new ObjectMapper());
+    UUID team = UUID.randomUUID();
+    BeaconBounceRunService.StartResponse run = service.start(team);
+
+    assertThat(service.hint(team, run.runId(), 0).penalty()).isEqualTo(2);
+    assertThatThrownBy(() -> service.hint(team, run.runId(), 0)).isInstanceOf(ResponseStatusException.class).hasMessageContaining("already been used");
+    for (String beacon : run.routes().get(0)) service.attempt(team, run.runId(), 0, beacon);
+
+    assertThat(service.start(team).securedScore()).isEqualTo(6);
+    assertThat(service.start(team).hintUsed()).isFalse();
+  }
 }

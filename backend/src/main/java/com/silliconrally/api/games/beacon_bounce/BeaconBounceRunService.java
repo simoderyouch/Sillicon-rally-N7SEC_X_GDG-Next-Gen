@@ -22,20 +22,22 @@ public class BeaconBounceRunService {
   private static final List<String> BEACONS = List.of("sun", "rose", "mint", "violet", "ember", "pearl", "lime", "plum", "apricot");
   private static final int[] LENGTHS = {3, 3, 4, 6, 7, 9};
   private static final int[] POINTS = {8, 10, 13, 16, 22, 31};
+  private static final int HINT_PENALTY = 2;
 
   private final StringRedisTemplate redis;
   private final ObjectMapper json;
   public BeaconBounceRunService(StringRedisTemplate redis, ObjectMapper json) { this.redis = redis; this.json = json; }
 
-  public record StartResponse(String runId, List<List<String>> routes, int round, int securedScore, boolean failed, boolean complete) { }
+  public record StartResponse(String runId, List<List<String>> routes, int round, int securedScore, boolean hintUsed, boolean failed, boolean complete) { }
   public record AttemptResponse(boolean correct, boolean roundCleared, boolean failed, boolean complete, int securedScore, int nextRound) { }
-  private record Run(String id, List<List<String>> routes, int round, int step, int securedScore, boolean failed, boolean complete) { }
+  public record HintResponse(int penalty) { }
+  private record Run(String id, List<List<String>> routes, int round, int step, int securedScore, boolean hintUsed, boolean failed, boolean complete) { }
 
   public StartResponse start(UUID teamId) {
     String key = key(teamId);
     String existing = redis.opsForValue().get(key);
     if (existing != null) return response(read(existing));
-    Run candidate = new Run(UUID.randomUUID().toString(), randomRoutes(), 0, 0, 0, false, false);
+    Run candidate = new Run(UUID.randomUUID().toString(), randomRoutes(), 0, 0, 0, false, false, false);
     Boolean created = redis.opsForValue().setIfAbsent(key, write(candidate), TTL);
     return response(Boolean.TRUE.equals(created) ? candidate : readRequired(redis.opsForValue().get(key)));
   }
@@ -48,23 +50,34 @@ public class BeaconBounceRunService {
     List<String> route = run.routes().get(run.round());
     if (!BEACONS.contains(beacon)) throw new ResponseStatusException(BAD_REQUEST, "Unknown beacon");
     if (!route.get(run.step()).equals(beacon)) {
-      Run failed = new Run(run.id(), run.routes(), run.round(), run.step(), run.securedScore(), true, false);
+      Run failed = new Run(run.id(), run.routes(), run.round(), run.step(), run.securedScore(), run.hintUsed(), true, false);
       save(teamId, failed);
       return new AttemptResponse(false, false, true, false, failed.securedScore(), failed.round());
     }
 
     int nextStep = run.step() + 1;
     if (nextStep < route.size()) {
-      Run next = new Run(run.id(), run.routes(), run.round(), nextStep, run.securedScore(), false, false);
+      Run next = new Run(run.id(), run.routes(), run.round(), nextStep, run.securedScore(), run.hintUsed(), false, false);
       save(teamId, next);
       return new AttemptResponse(true, false, false, false, next.securedScore(), next.round());
     }
 
-    int securedScore = run.securedScore() + POINTS[run.round()];
+    int securedScore = run.securedScore() + Math.max(0, POINTS[run.round()] - (run.hintUsed() ? HINT_PENALTY : 0));
     boolean complete = run.round() == LENGTHS.length - 1;
-    Run next = new Run(run.id(), run.routes(), complete ? run.round() : run.round() + 1, 0, securedScore, false, complete);
+    Run next = new Run(run.id(), run.routes(), complete ? run.round() : run.round() + 1, 0, securedScore, false, false, complete);
     save(teamId, next);
     return new AttemptResponse(true, true, false, complete, securedScore, next.round());
+  }
+
+  /** Allows one server-recorded replay of the active route at a fixed point cost. */
+  public HintResponse hint(UUID teamId, String runId, int round) {
+    Run run = readRequired(redis.opsForValue().get(key(teamId)));
+    if (!run.id().equals(runId)) throw new ResponseStatusException(BAD_REQUEST, "This run does not belong to the current team");
+    if (run.failed() || run.complete()) throw new ResponseStatusException(CONFLICT, "This competition run has already ended");
+    if (round != run.round()) throw new ResponseStatusException(BAD_REQUEST, "This is not the active round");
+    if (run.hintUsed()) throw new ResponseStatusException(CONFLICT, "This route replay has already been used");
+    save(teamId, new Run(run.id(), run.routes(), run.round(), run.step(), run.securedScore(), true, false, false));
+    return new HintResponse(HINT_PENALTY);
   }
 
   /** Returns a score only once the team's single run has failed or completed. */
@@ -86,7 +99,7 @@ public class BeaconBounceRunService {
     return List.copyOf(routes);
   }
   private String key(UUID teamId) { return PREFIX + teamId; }
-  private StartResponse response(Run run) { return new StartResponse(run.id(), run.routes(), run.round(), run.securedScore(), run.failed(), run.complete()); }
+  private StartResponse response(Run run) { return new StartResponse(run.id(), run.routes(), run.round(), run.securedScore(), run.hintUsed(), run.failed(), run.complete()); }
   private void save(UUID teamId, Run run) { redis.opsForValue().set(key(teamId), write(run), TTL); }
   private Run readRequired(String value) { if (value == null) throw new ResponseStatusException(CONFLICT, "Start a Beacon Bounce run before selecting a beacon"); return read(value); }
   private Run read(String value) { try { return json.readValue(value, Run.class); } catch (JsonProcessingException exception) { throw new IllegalStateException("Stored Beacon Bounce run is invalid", exception); } }
