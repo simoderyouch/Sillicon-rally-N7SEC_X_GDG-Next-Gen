@@ -13,8 +13,8 @@ function message(type: string, score = 0, overrides: Record<string, unknown> = {
 }
 function start() { message('ready'); fireEvent.click(screen.getByRole('button', { name: 'Start five-minute challenge' })); }
 function advance(ms: number) { act(() => vi.advanceTimersByTime(ms)); }
-beforeEach(() => { vi.useFakeTimers(); sessionStorage.clear(); sequence = 0; });
-afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks(); sessionStorage.clear(); });
+beforeEach(() => { vi.useFakeTimers(); localStorage.clear(); sessionStorage.clear(); sequence = 0; });
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks(); localStorage.clear(); sessionStorage.clear(); });
 describe('Pac-Man challenge', () => {
   it('renders the mission and waits for readiness before starting', () => {
     render(<Component mission={mission} onComplete={vi.fn()} />);

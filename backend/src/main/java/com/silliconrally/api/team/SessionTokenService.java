@@ -20,8 +20,17 @@ public class SessionTokenService {
 
   public String issueTeamToken(UUID teamId) { String token = UUID.randomUUID().toString(); redis.opsForValue().set(TEAM_PREFIX + token, teamId.toString(), ttl); return token; }
   public UUID requireTeam(String token) {
-    String teamId = token == null ? null : redis.opsForValue().get(TEAM_PREFIX + token);
-    try { if (teamId != null) return UUID.fromString(teamId); } catch (IllegalArgumentException ignored) { }
+    String key = token == null ? null : TEAM_PREFIX + token;
+    String teamId = key == null ? null : redis.opsForValue().get(key);
+    try {
+      if (teamId != null) {
+        UUID parsed = UUID.fromString(teamId);
+        // Active competition clients get a sliding expiry without trusting any
+        // client-provided identity beyond the opaque Redis token.
+        redis.expire(key, ttl);
+        return parsed;
+      }
+    } catch (IllegalArgumentException ignored) { }
     throw new ResponseStatusException(UNAUTHORIZED, "A team session is required");
   }
   public void revokeTeam(String token) { if (token != null) redis.delete(TEAM_PREFIX + token); }

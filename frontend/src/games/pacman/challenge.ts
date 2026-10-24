@@ -17,7 +17,7 @@ export function isEngineMessage(value: unknown, instance: string): value is Engi
     && Number.isSafeInteger(v.score) && v.score >= 0 && v.score <= 1000000;
 }
 export function readChallenge(key: string): Challenge | null {
-  const raw = sessionStorage.getItem(key);
+  const raw = localStorage.getItem(key);
   if (!raw) return null;
   const state = JSON.parse(raw) as Challenge;
   if (!Number.isSafeInteger(state.deadline) || !Number.isSafeInteger(state.score) || state.score < 0 || typeof state.handedOff !== 'boolean') {

@@ -108,8 +108,8 @@ describe('word-scramble', () => {
     expect(screen.getByRole('button', { name: 'Nouvelle partie' })).toBeDisabled();
   });
   it('separates team sessions and fails closed if storage cannot be written', () => {
-    sessionStorage.setItem('teamToken', 'team-a'); const a = model.storageKey(mission.id);
-    sessionStorage.setItem('teamToken', 'team-b'); expect(model.storageKey(mission.id)).not.toBe(a);
+    localStorage.setItem('teamToken', 'team-a'); const a = model.storageKey(mission.id);
+    localStorage.setItem('teamToken', 'team-b'); expect(model.storageKey(mission.id)).not.toBe(a);
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('Storage blocked'); });
     mount(); start();
     expect(screen.getByRole('alert')).toHaveTextContent('Sauvegarde impossible');

@@ -11,8 +11,8 @@ async function showRoute() {
   await waitFor(() => expect(screen.getByRole("button", { name: "Beacon Sun" })).toBeEnabled(), { timeout: 4_000 });
 }
 
-beforeEach(() => { sessionStorage.setItem("teamToken", "team-token"); });
-afterEach(() => { cleanup(); sessionStorage.clear(); vi.unstubAllGlobals(); });
+beforeEach(() => { localStorage.setItem("teamToken", "team-token"); });
+afterEach(() => { cleanup(); localStorage.clear(); sessionStorage.clear(); vi.unstubAllGlobals(); });
 
 describe("beacon-bounce game", () => {
   it("uses a server-created route and verifies each beacon through the private endpoint", async () => {

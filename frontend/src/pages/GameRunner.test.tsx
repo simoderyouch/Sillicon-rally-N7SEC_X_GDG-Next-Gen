@@ -26,12 +26,13 @@ function renderRunner() {
 }
 
 beforeEach(() => {
+  localStorage.clear();
   sessionStorage.clear();
-  sessionStorage.setItem("teamToken", "team-token");
+  localStorage.setItem("teamToken", "team-token");
   mocks.missions.mockResolvedValue([mission]);
   mocks.submitGameScore.mockReset();
 });
-afterEach(() => { vi.clearAllMocks(); sessionStorage.clear(); });
+afterEach(() => { vi.clearAllMocks(); localStorage.clear(); sessionStorage.clear(); });
 
 describe("GameRunner score delivery", () => {
   it("keeps a failed Pac-Man score and retries that payload without restarting the game", async () => {
@@ -41,7 +42,7 @@ describe("GameRunner score delivery", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Finish Pac-Man" }));
     await waitFor(() => expect(mocks.submitGameScore).toHaveBeenCalledTimes(3), { timeout: 5_000 });
     expect(screen.getByRole("alert")).toHaveTextContent("saved on this device");
-    expect(sessionStorage.getItem("rally:pending-score:v1:team-token:pacman")).toContain('"score":26');
+    expect(localStorage.getItem("rally:pending-score:v1:team-token:pacman")).toContain('"score":26');
 
     fireEvent.click(screen.getByRole("button", { name: "Retry score submission" }));
     await waitFor(() => expect(mocks.submitGameScore).toHaveBeenCalledTimes(4));

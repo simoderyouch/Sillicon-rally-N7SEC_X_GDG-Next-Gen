@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowUpRight, Flag, UsersRound } from "lucide-react";
 import { api } from "../api/client";
+import { saveTeamSession } from "../teamSession";
 
 export function JoinTeam() {
   const navigate = useNavigate();
@@ -15,8 +16,7 @@ export function JoinTeam() {
     setLoading(true); setError("");
     try {
       const session = await api.joinTeam(teamName.trim(), joinCode || undefined);
-      sessionStorage.setItem("teamToken", session.token);
-      sessionStorage.setItem("teamName", session.team.displayName);
+      saveTeamSession(session.token, session.team.displayName);
       navigate("/games");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not join team");

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Circle, Diamond, Hexagon, Plus, Sparkles, Star, Sun, Triangle, Zap, type LucideIcon } from "lucide-react";
 import type { GameDefinition, GameProps } from "../types";
 import { beaconBounceApi, type BeaconRun } from "./gameApi";
+import { getTeamToken } from "../../teamSession";
 import "./beacon-bounce.css";
 
 type BeaconId = "sun" | "rose" | "mint" | "violet" | "ember" | "pearl" | "lime" | "plum" | "apricot";
@@ -18,7 +19,7 @@ const rounds = [
 ];
 
 function BeaconBounce({ mission, onComplete, disabled = false }: GameProps) {
-  const token = sessionStorage.getItem("teamToken");
+  const token = getTeamToken();
   const [run, setRun] = useState<BeaconRun | null>(null);
   const [round, setRound] = useState(0);
   const [phase, setPhase] = useState<Phase>("loading");

@@ -6,7 +6,7 @@ Slug: `pacman`. Original JavaScript gameplay by Brent Ward, reused from the exis
 
 Click **Start five-minute challenge** after assets are ready. Arrow keys/WASD move; Escape pauses gameplay; Q or the labelled sound button toggles sound. Click the maze to restore keyboard focus. One keyboard serves the whole team.
 
-The challenge ends when the player loses the final life or when 300 seconds elapse after the explicit start—whichever happens first. The deadline, cumulative score and callback handoff marker are persisted in sessionStorage under the current team token and mission ID. A remount/reload resumes with a fresh maze and retained points/time. Closing the browser session or clearing storage is outside this client-only persistence guarantee. A team session has one attempt; there is deliberately no reset button.
+The challenge ends when the player loses the final life or when 300 seconds elapse after the explicit start—whichever happens first. The deadline, cumulative score and callback handoff marker are persisted in localStorage under the current team token and mission ID. A remount, reload, or browser restart resumes with a fresh maze and retained points/time. Clearing browser storage ends this client-side persistence guarantee. A team session has one attempt; there is deliberately no reset button.
 
 The original three-life round, collisions, ghost AI, pellets, fruit and extra life remain intact. When the game reports game-over, the current points are submitted immediately and the challenge cannot be restarted. Disabled/error states remove the iframe, destroying its timers, audio and input listeners. Re-enabling/retrying starts a fresh round only before game-over or the deadline.
 

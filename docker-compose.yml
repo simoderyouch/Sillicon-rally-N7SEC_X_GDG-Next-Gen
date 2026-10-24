@@ -31,6 +31,8 @@ services:
       SPRING_DATA_REDIS_PORT: 6379
       APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173,https://silicon-rally.edder.studio}
       OPEN_TEAM_REGISTRATION: ${OPEN_TEAM_REGISTRATION:-true}
+      # Active team tokens use a sliding expiry. Set this to cover the full event.
+      APP_SESSION_TOKEN_TTL: ${APP_SESSION_TOKEN_TTL:-PT24H}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@sillicon-rally.local}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-change-me-before-an-event}
     expose:

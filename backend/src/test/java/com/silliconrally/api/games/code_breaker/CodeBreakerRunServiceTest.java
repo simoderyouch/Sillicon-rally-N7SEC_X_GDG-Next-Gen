@@ -10,7 +10,9 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -18,6 +20,36 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.server.ResponseStatusException;
 
 class CodeBreakerRunServiceTest {
+  @Test
+  void keeps_each_teams_code_breaker_progress_in_its_own_run() {
+    StringRedisTemplate redis = org.mockito.Mockito.mock(StringRedisTemplate.class);
+    @SuppressWarnings("unchecked") ValueOperations<String, String> values = org.mockito.Mockito.mock(ValueOperations.class);
+    Map<String, String> stored = new ConcurrentHashMap<>();
+    when(redis.opsForValue()).thenReturn(values);
+    when(values.get(anyString())).thenAnswer(invocation -> stored.get(invocation.getArgument(0)));
+    when(values.setIfAbsent(anyString(), anyString(), any(Duration.class))).thenAnswer(invocation ->
+      stored.putIfAbsent(invocation.getArgument(0), invocation.getArgument(1)) == null);
+    doAnswer(invocation -> { stored.put(invocation.getArgument(0), invocation.getArgument(1)); return null; })
+      .when(values).set(anyString(), anyString(), any(Duration.class));
+    CodeBreakerRunService service = new CodeBreakerRunService(redis, new ObjectMapper());
+    UUID firstTeam = UUID.randomUUID();
+    UUID secondTeam = UUID.randomUUID();
+    CodeBreakerPuzzle puzzle = new CodeBreakerPuzzle();
+
+    service.start(firstTeam);
+    service.attempt(firstTeam, 0, wrongCode(puzzle, 0));
+
+    assertThat(service.start(firstTeam)).extracting(
+      CodeBreakerRunService.StartResponse::round,
+      CodeBreakerRunService.StartResponse::attemptsRemaining
+    ).containsExactly(0, 6);
+    assertThat(service.start(secondTeam)).extracting(
+      CodeBreakerRunService.StartResponse::round,
+      CodeBreakerRunService.StartResponse::attemptsRemaining,
+      CodeBreakerRunService.StartResponse::securedScore
+    ).containsExactly(0, 7, 0);
+  }
+
   @Test
   void keepsAttemptBudgetAndMovesPastAFailedRoundWithoutAllowingARetry() {
     StringRedisTemplate redis = org.mockito.Mockito.mock(StringRedisTemplate.class);

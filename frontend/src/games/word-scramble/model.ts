@@ -51,8 +51,8 @@ export function readRun(key: string): Run | null {
 }
 export function saveRun(key: string, run: Run): void { localStorage.setItem(key, JSON.stringify(run)); }
 export function storageKey(missionId: string): string {
-  // Session token is only read to scope state; credentials are never copied to localStorage.
-  const identity = sessionStorage.getItem('teamToken') ?? 'local-preview';
+  // Only a one-way hash of the durable team token is used in the local key.
+  const identity = localStorage.getItem('teamToken') ?? sessionStorage.getItem('teamToken') ?? 'local-preview';
   let hash = 2166136261;
   for (const char of identity) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
   return `word-scramble:v1:${missionId}:${(hash >>> 0).toString(36)}`;

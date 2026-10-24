@@ -18,8 +18,8 @@ async function nextRound() {
   await ready();
 }
 
-beforeEach(() => { sessionStorage.setItem("teamToken", "team-token"); });
-afterEach(() => { cleanup(); sessionStorage.clear(); vi.unstubAllGlobals(); });
+beforeEach(() => { localStorage.setItem("teamToken", "team-token"); });
+afterEach(() => { cleanup(); localStorage.clear(); sessionStorage.clear(); vi.unstubAllGlobals(); });
 
 describe("code-breaker game", () => {
   it("reports the server-verified full score after cracking all three fixed codes", async () => {
