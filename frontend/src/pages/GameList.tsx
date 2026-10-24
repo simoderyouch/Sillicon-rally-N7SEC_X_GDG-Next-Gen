@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight, CircleDot, Construction, Play, Sparkles } from "lucide-react";
 import { api } from "../api/client";
 import { games } from "../games/registry";
+import { getTeamName } from "../teamSession";
 
 export function GameList() {
-  const teamName = sessionStorage.getItem("teamName");
+  const teamName = getTeamName();
   const { data, isPending, error } = useQuery({ queryKey: ["missions"], queryFn: api.missions });
   if (!teamName) return <section className="empty-state"><p className="eyebrow">Session missing</p><h1>Join the challenge.</h1><Link className="button-primary" to="/play">Join a team <ArrowUpRight size={17} /></Link></section>;
   return <section className="mission-board">

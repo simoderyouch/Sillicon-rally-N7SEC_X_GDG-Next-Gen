@@ -2,6 +2,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { Box, CircleDot, Leaf, Moon, Rocket, Sparkles, Waves, Zap, type LucideIcon } from "lucide-react";
 import type { GameDefinition, GameProps } from "../types";
 import { codeBreakerApi } from "./gameApi";
+import { getTeamToken } from "../../teamSession";
 import "./code-breaker.css";
 
 type SymbolId = "comet" | "orbit" | "spark" | "leaf" | "wave" | "cube" | "moon" | "bolt";
@@ -41,7 +42,7 @@ function CodeBreaker({ mission, onComplete, disabled = false }: GameProps) {
 
   const currentRound = rounds[round];
   const triesLeft = attemptsRemaining;
-  const token = sessionStorage.getItem("teamToken");
+  const token = getTeamToken();
 
   useEffect(() => {
     if (!token) { setRequestError("Join a team before opening this challenge."); return; }

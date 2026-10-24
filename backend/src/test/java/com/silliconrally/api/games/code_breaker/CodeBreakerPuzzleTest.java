@@ -10,9 +10,9 @@ class CodeBreakerPuzzleTest {
 
   @Test
   void exposes_the_fixed_code_for_each_round() {
-    assertEquals(List.of("comet", "orbit", "spark"), puzzle.answerFor(0));
-    assertEquals(List.of("spark", "moon", "orbit"), puzzle.answerFor(1));
-    assertEquals(List.of("moon", "bolt", "moon", "leaf", "orbit"), puzzle.answerFor(2));
+    assertEquals(List.of("moon", "comet", "cube"), puzzle.answerFor(0));
+    assertEquals(List.of("bolt", "spark", "cube"), puzzle.answerFor(1));
+    assertEquals(List.of("orbit", "bolt", "wave", "comet", "moon"), puzzle.answerFor(2));
   }
 
   @Test

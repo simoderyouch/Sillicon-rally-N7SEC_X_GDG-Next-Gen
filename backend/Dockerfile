@@ -1,8 +1,11 @@
 FROM maven:3.9-eclipse-temurin-17-alpine AS build
 WORKDIR /workspace
 
-COPY pom.xml .
-COPY src src
+# The catalog is generated from frontend game folders during the Maven build.
+COPY backend/pom.xml .
+COPY backend/src src
+COPY scripts /scripts
+COPY frontend/src/games /frontend/src/games
 RUN mvn -B -q -DskipTests package
 
 FROM eclipse-temurin:17-jre-alpine

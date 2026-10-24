@@ -6,11 +6,11 @@ import * as data from './scenarios';
 import { screenshot } from './visuals';
 const mission = { id: 'cyber', slug: 'cyber-awareness-hub', title: 'Phishing Detective', description: '', maxScore: 100, releaseState: 'PUBLISHED' as const };
 beforeEach(() => {
-  sessionStorage.clear(); sessionStorage.setItem('teamToken', 'platform-team-token');
+  localStorage.clear(); sessionStorage.clear(); localStorage.setItem('teamToken', 'platform-team-token');
   vi.spyOn(completionApi, 'state').mockResolvedValue({ locked: false, score: null, claimed: false });
   vi.spyOn(completionApi, 'claim').mockImplementation(async (_, score) => ({ locked: true, score, claimed: true }));
 });
-afterEach(() => { cleanup(); vi.restoreAllMocks(); });
+afterEach(() => { cleanup(); localStorage.clear(); sessionStorage.clear(); vi.restoreAllMocks(); });
 describe('Phishing Detective', () => {
   it('contains exactly the required distribution, safe simulations, and valid vector screenshots', () => {
     expect(new Set(data.scenarios.map(s => s.id)).size).toBe(12);
@@ -88,7 +88,7 @@ describe('completed team lock', () => {
     expect(await screen.findByText('75/100')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Commencer|Rejouer|Réactiver|Recommencer/ })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Résultat transmis' })).toBeDisabled();
-    view.unmount(); sessionStorage.setItem('teamToken', 'renewed-platform-token');
+    view.unmount(); localStorage.setItem('teamToken', 'renewed-platform-token');
     render(<Component mission={mission} onComplete={onComplete} />);
     expect(await screen.findByText('75/100')).toBeInTheDocument();
     expect(completionApi.state).toHaveBeenLastCalledWith('renewed-platform-token');

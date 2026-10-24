@@ -24,5 +24,17 @@
     <dependency><groupId>org.springframework.security</groupId><artifactId>spring-security-crypto</artifactId></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-test</artifactId><scope>test</scope></dependency>
   </dependencies>
-  <build><plugins><plugin><groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId></plugin></plugins></build>
+  <build><plugins>
+    <plugin><groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId></plugin>
+    <plugin>
+      <groupId>org.codehaus.mojo</groupId><artifactId>exec-maven-plugin</artifactId><version>3.5.0</version>
+      <executions><execution><id>catalog-frontend-games</id><phase>process-resources</phase><goals><goal>exec</goal></goals>
+        <configuration><executable>sh</executable><arguments>
+          <argument>${project.basedir}/../scripts/generate-game-catalog.sh</argument>
+          <argument>${project.basedir}/../frontend/src/games</argument>
+          <argument>${project.build.outputDirectory}/game-catalog.txt</argument>
+        </arguments></configuration>
+      </execution></executions>
+    </plugin>
+  </plugins></build>
 </project>

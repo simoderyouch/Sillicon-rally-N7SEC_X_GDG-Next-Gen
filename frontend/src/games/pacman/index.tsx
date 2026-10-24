@@ -2,9 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { GameDefinition, GameProps } from '../types';
 import { DURATION_SECONDS, isEngineMessage, normalizeScore, readChallenge, type Challenge } from './challenge';
 import { frameDocument } from './frame';
+import { getTeamToken } from '../../teamSession';
 
 function Game({ mission, onComplete, disabled = false }: GameProps) {
-  const key = `rally:pacman:v1:${sessionStorage.getItem('teamToken') ?? 'preview'}:${mission.id}`;
+  const key = `rally:pacman:v1:${getTeamToken() ?? 'preview'}:${mission.id}`;
   const [initial] = useState(() => {
     try { return { state: readChallenge(key), error: '' }; }
     catch { return { state: null, error: 'Challenge storage is unavailable or invalid. Ask an organiser for help.' }; }
@@ -24,7 +25,7 @@ function Game({ mission, onComplete, disabled = false }: GameProps) {
   callback.current = onComplete;
   const document = useMemo(() => frameDocument(instance), [instance]);
   function persist(next: Challenge) {
-    try { sessionStorage.setItem(key, JSON.stringify(next)); state.current = next; return true; }
+    try { localStorage.setItem(key, JSON.stringify(next)); state.current = next; return true; }
     catch { setError('Cannot save the challenge. Ask an organiser for help.'); return false; }
   }
   function command(type: 'start' | 'stop') {

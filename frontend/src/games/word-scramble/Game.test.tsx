@@ -14,7 +14,7 @@ function answer(value: string) {
 }
 function solve() { const saved = model.readRun(model.storageKey(mission.id))!; answer(saved.rounds[model.currentIndex(saved)].word.toLowerCase()); }
 function hint() { fireEvent.click(screen.getByRole('button', { name: 'Afficher un indice' })); }
-beforeEach(() => { localStorage.clear(); sessionStorage.clear(); sessionStorage.setItem('teamToken', 'team-test'); vi.spyOn(completionApi, 'state').mockResolvedValue({ locked: false, score: null, claimed: false }); vi.spyOn(completionApi, 'claim').mockImplementation(async (_, score) => ({ locked: true, score, claimed: true })); vi.spyOn(model, 'newRun').mockImplementation(() => originalNewRun(() => 0.999)); });
+beforeEach(() => { localStorage.clear(); sessionStorage.clear(); localStorage.setItem('teamToken', 'team-test'); vi.spyOn(completionApi, 'state').mockResolvedValue({ locked: false, score: null, claimed: false }); vi.spyOn(completionApi, 'claim').mockImplementation(async (_, score) => ({ locked: true, score, claimed: true })); vi.spyOn(model, 'newRun').mockImplementation(() => originalNewRun(() => 0.999)); });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 describe('word-scramble', async () => {
   it('plays exactly the prescribed words, always scrambled, in randomized order', async () => {
@@ -105,8 +105,8 @@ describe('word-scramble', async () => {
     expect(screen.getByRole('button', { name: 'Afficher un indice' })).toBeDisabled();
   });
   it('separates team sessions and fails closed if storage cannot be written', async () => {
-    sessionStorage.setItem('teamToken', 'team-a'); const a = model.storageKey(mission.id);
-    sessionStorage.setItem('teamToken', 'team-b'); expect(model.storageKey(mission.id)).not.toBe(a);
+    localStorage.setItem('teamToken', 'team-a'); const a = model.storageKey(mission.id);
+    localStorage.setItem('teamToken', 'team-b'); expect(model.storageKey(mission.id)).not.toBe(a);
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('Storage blocked'); });
     mount(); await start();
     expect(screen.getByRole('alert')).toHaveTextContent('Sauvegarde impossible');
@@ -135,7 +135,7 @@ describe('three-attempt limit and team completion', () => {
     expect(await screen.findByText('90', {selector:'.ws-final-score'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name:'Résultat transmis'})).toBeDisabled();
     expect(screen.queryByRole('button', {name:/Commencer|Rejouer|Recommencer|Nouvelle partie/})).not.toBeInTheDocument();
-    view.unmount(); localStorage.clear(); sessionStorage.setItem('teamToken','renewed-token');
+    view.unmount(); localStorage.clear(); localStorage.setItem('teamToken','renewed-token');
     mount(view.onComplete);
     await screen.findByText('90', {selector:'.ws-final-score'});
     expect(completionApi.state).toHaveBeenLastCalledWith('renewed-token');

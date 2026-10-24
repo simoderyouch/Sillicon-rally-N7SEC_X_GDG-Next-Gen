@@ -10,7 +10,9 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -18,6 +20,37 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.server.ResponseStatusException;
 
 class BeaconBounceRunServiceTest {
+  @Test
+  void keeps_each_teams_beacon_run_and_hints_separate() {
+    StringRedisTemplate redis = org.mockito.Mockito.mock(StringRedisTemplate.class);
+    @SuppressWarnings("unchecked") ValueOperations<String, String> values = org.mockito.Mockito.mock(ValueOperations.class);
+    Map<String, String> stored = new ConcurrentHashMap<>();
+    when(redis.opsForValue()).thenReturn(values);
+    when(values.get(anyString())).thenAnswer(invocation -> stored.get(invocation.getArgument(0)));
+    when(values.setIfAbsent(anyString(), anyString(), any(Duration.class))).thenAnswer(invocation ->
+      stored.putIfAbsent(invocation.getArgument(0), invocation.getArgument(1)) == null);
+    doAnswer(invocation -> { stored.put(invocation.getArgument(0), invocation.getArgument(1)); return null; })
+      .when(values).set(anyString(), anyString(), any(Duration.class));
+    BeaconBounceRunService service = new BeaconBounceRunService(redis, new ObjectMapper());
+    UUID firstTeam = UUID.randomUUID();
+    UUID secondTeam = UUID.randomUUID();
+
+    BeaconBounceRunService.StartResponse first = service.start(firstTeam);
+    service.hint(firstTeam, first.runId(), 0);
+    BeaconBounceRunService.StartResponse second = service.start(secondTeam);
+
+    assertThat(second.runId()).isNotEqualTo(first.runId());
+    assertThat(service.start(firstTeam)).extracting(
+      BeaconBounceRunService.StartResponse::hintsUsed,
+      BeaconBounceRunService.StartResponse::hintsRemaining
+    ).containsExactly(1, 2);
+    assertThat(second).extracting(
+      BeaconBounceRunService.StartResponse::hintsUsed,
+      BeaconBounceRunService.StartResponse::hintsRemaining,
+      BeaconBounceRunService.StartResponse::securedScore
+    ).containsExactly(0, 3, 0);
+  }
+
   @Test
   void createsOneRandomRunThenKeepsItsScoreAndTerminalFailure() {
     StringRedisTemplate redis = org.mockito.Mockito.mock(StringRedisTemplate.class);

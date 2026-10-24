@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { CHALLENGES, TOTAL_SECONDS } from './challenges';
 import { blankSave, legacyStorageKey, parseSave, retireLegacySession, settleExpired } from './persistence';
 import { challengeScore, submittedScore, totalScore } from './scoring';
+import { afterEach } from 'vitest';
+
+afterEach(() => { localStorage.clear(); sessionStorage.clear(); });
 
 describe('password scoring and recovery', () => {
   it('pays the base plus a proportional speed bonus, rounded to cents', () => {
@@ -40,9 +43,9 @@ describe('password scoring and recovery', () => {
     expect(parseSave(null)?.phase).toBe('briefing');
     expect(parseSave('{')).toBeNull();
     expect(parseSave(JSON.stringify({ phase: 'playing', index: 99, deadline: 1, outcomes: [], draft: '', handedOff: false, startedAt: 1, finishedAt: null }))).toBeNull();
-    sessionStorage.setItem(legacyStorageKey('mission'), '{"phase":"playing"}');
+    localStorage.setItem(legacyStorageKey('mission'), '{"phase":"playing"}');
     expect(retireLegacySession('mission')).toBe(true);
-    expect(sessionStorage.getItem(legacyStorageKey('mission'))).toBeNull();
+    expect(localStorage.getItem(legacyStorageKey('mission'))).toBeNull();
     expect(retireLegacySession('mission')).toBe(false);
   });
 });

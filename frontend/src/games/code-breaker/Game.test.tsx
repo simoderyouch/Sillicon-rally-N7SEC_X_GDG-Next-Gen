@@ -18,8 +18,8 @@ async function nextRound() {
   await ready();
 }
 
-beforeEach(() => { sessionStorage.setItem("teamToken", "team-token"); });
-afterEach(() => { cleanup(); sessionStorage.clear(); vi.unstubAllGlobals(); });
+beforeEach(() => { localStorage.setItem("teamToken", "team-token"); });
+afterEach(() => { cleanup(); localStorage.clear(); sessionStorage.clear(); vi.unstubAllGlobals(); });
 
 describe("code-breaker game", () => {
   it("reports the server-verified full score after cracking all three fixed codes", async () => {
@@ -34,9 +34,9 @@ describe("code-breaker game", () => {
     render(<Component mission={mission} onComplete={onComplete} />);
 
     await ready();
-    enter("Comet", "Orbit", "Spark"); await nextRound();
-    enter("Spark", "Moon", "Orbit"); await nextRound();
-    enter("Moon", "Bolt", "Moon", "Leaf", "Orbit");
+    enter("Moon", "Comet", "Cube"); await nextRound();
+    enter("Bolt", "Spark", "Cube"); await nextRound();
+    enter("Orbit", "Bolt", "Wave", "Comet", "Moon");
     await waitFor(() => expect(screen.getByText("Sequence cracked.")).toBeInTheDocument());
     fireEvent.click(screen.getByRole("button", { name: /dispatch result/i }));
 

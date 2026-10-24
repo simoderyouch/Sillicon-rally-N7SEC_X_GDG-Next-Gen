@@ -3,10 +3,11 @@ import { Lightbulb, LockKeyhole, Send, ShieldCheck } from 'lucide-react';
 import type { GameDefinition, GameProps } from '../types';
 import { currentIndex, hintsRemaining, MAX_ATTEMPTS, newRun, points, readRun, saveRun, score, storageKey, words, type Run } from './model';
 import { completionApi } from './completionApi';
+import { getTeamToken } from '../../teamSession';
 import './word-scramble.css';
 
 function Game({ mission, onComplete, disabled = false }: GameProps) {
-  const token = sessionStorage.getItem('teamToken');
+  const token = getTeamToken();
   const preview = mission.id === 'word-scramble-preview' && !token;
   const [key] = useState(() => storageKey(mission.id));
   const [initial] = useState(() => { try { return { run: readRun(key), error: '' }; } catch { return { run: null, error: 'Impossible de lire la sauvegarde. Contactez un organisateur.' }; } });
