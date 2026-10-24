@@ -125,7 +125,7 @@ function Game({ mission, onComplete, disabled = false }: GameProps) {
         <strong aria-label="Time remaining">{time}</strong><strong>Pac-Man score: {score}</strong>
         <span>Mission estimate: {normalizeScore(score, mission.maxScore)} / {mission.maxScore}</span>
       </div>
-      {finished ? <p role="status">Challenge complete. Result handed to Silicon Rally for submission.</p> : disabled ? <p role="status">Mission unavailable. The challenge clock continues.</p> : <>
+      {finished ? <p role="status">Challenge complete. Score is saved and being submitted to Silicon Rally.</p> : disabled ? <p role="status">Mission unavailable. The challenge clock continues.</p> : <>
         {!state.current && <button className="button-primary" disabled={!ready || !!error} onClick={start}>Start five-minute challenge</button>}
         <p role="status">{error ? '' : !ready ? 'Loading Pac-Man…' : roundOver ? 'Round over. Press PLAY in the game to continue; your points and deadline are retained.' : state.current ? 'Challenge running. Click the maze to focus the keyboard.' : 'Ready. Start when your team is prepared.'}</p>
         {error ? <div role="alert"><p>{error}</p>{!initial.error && <button onClick={reload}>Retry loading</button>}</div> :
