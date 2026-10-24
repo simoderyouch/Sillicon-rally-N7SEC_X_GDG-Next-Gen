@@ -36,7 +36,7 @@ required trusted HTTPS origin and proxy-header chain for API and WebSocket traff
 
 Opaque team and admin tokens are stored in Redis with a 12-hour expiry, so any API instance can serve a client behind the load balancer. They remain browser-held tokens for this local-network event; use HTTPS, restricted LAN access, strong admin credentials, rate limits, hashed team join codes, and secure HTTP-only sessions (or an approved identity provider) for an internet-facing deployment.
 
-For an event-wide code, set `APP_TEAM_JOIN_CODE` in the shared `.env` file or the backend service environment in OpenShip. Give every participant the same code; each can enter their own team name and join concurrently. A team name identifies its shared team record, while different names get separate score and game state. Leave this variable empty for local development without a shared code. Team registration defaults to enabled (`OPEN_TEAM_REGISTRATION=true`) when unset; set it to `false` only to block new team registrations.
+Set `APP_TEAM_JOIN_CODE` in the shared `.env` file or the backend service environment in OpenShip before allowing teams to join. Give every participant the same code; each can enter their own team name and join concurrently. A team name identifies its shared team record, while different names get separate score and game state. Team registration defaults to enabled (`OPEN_TEAM_REGISTRATION=true`) when unset, but a valid shared join code is still required. If the shared code is unset, new team joins are rejected until the organizer configures it. Set registration to `false` only to block new team registrations.
 
 ## Live leaderboard
 

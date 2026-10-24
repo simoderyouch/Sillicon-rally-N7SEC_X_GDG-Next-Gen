@@ -24,6 +24,8 @@ export type EventState = {
   leaderboardLocked: boolean;
 };
 
+export type TeamJoinCodeStatus = { configured: boolean };
+
 export type AdminSession = { token: string; email: string };
 
 export type GameScoreResponse = { missionSlug: string; score: number; completed: boolean; submittedAt: string };

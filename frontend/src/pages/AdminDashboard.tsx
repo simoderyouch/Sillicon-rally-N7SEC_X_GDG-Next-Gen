@@ -18,11 +18,13 @@ export function AdminDashboard() {
   const token = sessionStorage.getItem("adminToken");
   const queryClient = useQueryClient();
   const [teamName, setTeamName] = useState("");
+  const [joinCode, setJoinCode] = useState("");
   const [missionDraft, setMissionDraft] = useState<MissionDraft>(blankMission);
 
   const teams = useQuery({ queryKey: ["admin", "teams"], queryFn: () => api.adminTeams(token!), enabled: Boolean(token) });
   const missions = useQuery({ queryKey: ["admin", "missions"], queryFn: () => api.adminMissions(token!), enabled: Boolean(token) });
   const eventState = useQuery({ queryKey: ["admin", "event"], queryFn: () => api.eventState(token!), enabled: Boolean(token) });
+  const joinCodeStatus = useQuery({ queryKey: ["admin", "team-join-code"], queryFn: () => api.adminTeamJoinCode(token!), enabled: Boolean(token) });
   const createTeam = useMutation({
     mutationFn: () => api.createTeam(token!, teamName),
     onSuccess: () => { setTeamName(""); queryClient.invalidateQueries({ queryKey: ["admin", "teams"] }); },
@@ -34,6 +36,10 @@ export function AdminDashboard() {
   const updateEvent = useMutation({
     mutationFn: (isOpen: boolean) => api.updateEventState(token!, { isOpen }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "event"] }),
+  });
+  const updateJoinCode = useMutation({
+    mutationFn: () => api.updateAdminTeamJoinCode(token!, joinCode),
+    onSuccess: () => { setJoinCode(""); queryClient.invalidateQueries({ queryKey: ["admin", "team-join-code"] }); },
   });
   const createMission = useMutation({
     mutationFn: () => api.createMission(token!, missionDraft),
@@ -99,6 +105,16 @@ export function AdminDashboard() {
         {(updateEvent.error || resetLeaderboard.error || wipeEvent.error) && <p className="error" role="alert">{(updateEvent.error ?? resetLeaderboard.error ?? wipeEvent.error)?.message}</p>}
       </div>
       <div className="admin-stat"><span>{teams.data?.length ?? "—"}</span><p>registered teams</p></div>
+    </div>
+    <div className="form-card admin-join-code-card">
+      <div className="panel-heading"><div><p className="form-kicker">Competition access</p><h2>Shared team join code</h2></div><span className={`status-pill ${joinCodeStatus.data?.configured ? "is-active" : "is-inactive"}`}>{joinCodeStatus.isPending ? "checking…" : joinCodeStatus.data?.configured ? "configured" : "not set"}</span></div>
+      <p>Set the code teams must enter with their name. The code is stored securely and never shown here after saving. Updating it changes the code for future team logins.</p>
+      <form onSubmit={(event) => { event.preventDefault(); if (joinCode.trim().length >= 4) updateJoinCode.mutate(); }}>
+        <label>New shared code<input required minLength={4} maxLength={64} autoComplete="new-password" type="password" placeholder="At least 4 characters" value={joinCode} onChange={(event) => setJoinCode(event.target.value)} /></label>
+        <button className="button-primary" disabled={updateJoinCode.isPending || joinCode.trim().length < 4}>{updateJoinCode.isPending ? "Saving…" : "Save join code"}<span aria-hidden="true">→</span></button>
+      </form>
+      {(joinCodeStatus.error || updateJoinCode.error) && <p className="error" role="alert">{(joinCodeStatus.error ?? updateJoinCode.error)?.message}</p>}
+      {updateJoinCode.isSuccess && <p className="success-copy" role="status">Shared team join code updated.</p>}
     </div>
     <div className="admin-grid">
       <div className="form-card create-team-card">
