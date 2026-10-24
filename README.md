@@ -36,6 +36,8 @@ required trusted HTTPS origin and proxy-header chain for API and WebSocket traff
 
 Opaque team and admin tokens are stored in Redis with a 12-hour expiry, so any API instance can serve a client behind the load balancer. They remain browser-held tokens for this local-network event; use HTTPS, restricted LAN access, strong admin credentials, rate limits, hashed team join codes, and secure HTTP-only sessions (or an approved identity provider) for an internet-facing deployment.
 
+For an event-wide code, set `APP_TEAM_JOIN_CODE` in the shared `.env` file or the backend service environment in OpenShip. Give every participant the same code; each can enter their own team name and join concurrently. A team name identifies its shared team record, while different names get separate score and game state. Leave this variable empty for local development without a shared code. Keep `OPEN_TEAM_REGISTRATION=true` to allow new teams to register.
+
 ## Live leaderboard
 
 The projector and player scoreboard use `GET /api/v1/leaderboard` for the initial state and `ws://<host>/ws/leaderboard` for updates after each successful score. Redis distributes each update to every API instance, so clients connected to either server receive the same board. The UI also reconciles with the API every 15 seconds if a WebSocket reconnect is needed.
