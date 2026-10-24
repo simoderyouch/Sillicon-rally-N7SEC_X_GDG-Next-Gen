@@ -65,14 +65,17 @@ describe('Team Trivia Battle', () => {
     expect(answer).not.toHaveBeenCalled();
     expect(screen.queryByRole('button', { name: /pause|reset|recommencer/i })).not.toBeInTheDocument();
   });
-  it('reviews 15 questions and hands off the actual normalized result only once across reloads', async () => {
+  it('shows only the final score and hands off the result once across reloads', async () => {
     const result = fixture(); result.complete = true; result.question = null; result.answered = 15; result.number = 15;
     result.correctAnswers = 12; result.incorrectAnswers = 2; result.timeouts = 1; result.rawScore = 120; result.score = 80; result.totalTimeMs = 180000; result.rank = 'Knowledge Expert';
     result.review = Array.from({ length: 15 }, (_, i) => ({ question: { id: `it-${i}`, text: `Question revue ${i + 1}`, options: ['A', 'B', 'C', 'D'], difficulty: 'easy' as const }, selected: i < 14 ? 0 : null, correctOption: 0, correct: i < 12, timeout: i === 14, explanation: `Explication ${i + 1}` }));
     vi.spyOn(triviaApi, 'state').mockResolvedValue(result);
     const handoff = vi.spyOn(triviaApi, 'handoff').mockResolvedValue({ ...result, handedOff: true });
-    const view = mount(); await screen.findByRole('heading', { name: 'Knowledge Expert' });
-    expect(document.querySelectorAll('.tt-review details')).toHaveLength(15);
+    const view = mount(); await screen.findByRole('heading', { name: 'Votre score final' });
+    expect(screen.getByText('80', { selector: '.tt-final-score' })).toBeInTheDocument();
+    expect(screen.queryByText('Knowledge Expert')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Question revue|Explication/)).not.toBeInTheDocument();
+    expect(screen.queryByText('Score brut')).not.toBeInTheDocument();
     expect(view.onComplete).not.toHaveBeenCalled();
     const button = screen.getByRole('button', { name: 'Transmettre mon score' });
     fireEvent.click(button); fireEvent.click(button);

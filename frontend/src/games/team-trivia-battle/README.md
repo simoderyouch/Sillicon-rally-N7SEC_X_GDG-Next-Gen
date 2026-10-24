@@ -37,7 +37,7 @@ Ils utilisent `X-Team-Token`. Aucun identifiant d'équipe fourni par le joueur n
 
 ## Transmission au classement
 
-Le bilan reste visible pour permettre la lecture des corrections. Le bouton « Transmettre mon score » réserve une transmission unique sur le serveur puis appelle `onComplete` avec le score normalisé et les compteurs réels. Le `GameRunner` existant enregistre le score puis revient à `/games`. Un lien « Return to Games » utilise le routeur de la plateforme ; revenir plus tard retrouve le bilan et permet la transmission si elle n'a pas été réservée.
+L’écran final affiche uniquement le score normalisé, sans corrigé ni statistiques détaillées. Le bouton « Transmettre mon score » réserve une transmission unique sur le serveur puis appelle `onComplete` avec le score normalisé et les compteurs réels. Le `GameRunner` existant enregistre le score puis revient à `/games`. Un lien « Return to Games » utilise le routeur de la plateforme ; revenir plus tard retrouve le bilan et permet la transmission si elle n'a pas été réservée.
 
 Le package privé n'appelle aucun endpoint de score et ne persiste aucun score en base. Les fichiers partagés, migrations et autres jeux ne sont pas modifiés. Comme les autres callbacks du dépôt, une transmission au maximum une fois ne peut garantir une livraison réseau exactement une fois : si le navigateur se ferme entre la réservation et le callback, ou si le score est rejeté, le jeu ne réémet pas automatiquement. Il faut alors l'intervention de l'organisateur ; la plateforme doit fournir l'idempotence de bout en bout pour autoriser des reprises sûres. Le vérificateur de score partagé reste inchangé et n'est pas raccordé à cette partie privée ; aucune garantie anti-triche globale supplémentaire n'est revendiquée.
 
