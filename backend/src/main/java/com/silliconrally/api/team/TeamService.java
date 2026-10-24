@@ -24,19 +24,26 @@ public class TeamService {
 
   public TeamDtos.TeamSessionResponse join(TeamDtos.JoinRequest request) {
     String suppliedCode = request.joinCode() == null ? "" : request.joinCode();
-    if (!sharedJoinCode.isEmpty() && !MessageDigest.isEqual(sharedJoinCode.getBytes(StandardCharsets.UTF_8), suppliedCode.getBytes(StandardCharsets.UTF_8))) {
-      throw new ResponseStatusException(FORBIDDEN, "Invalid event join code");
-    }
     String name = request.teamName().trim();
-    Team team = teams.findByDisplayNameIgnoreCase(name).orElseGet(() -> createOpenRegistrationTeam(name, sharedJoinCode.isEmpty() ? request.joinCode() : null));
+    Team team = teams.findByDisplayNameIgnoreCase(name).orElse(null);
+    if (!sharedJoinCode.isEmpty()) {
+      if (!MessageDigest.isEqual(sharedJoinCode.getBytes(StandardCharsets.UTF_8), suppliedCode.getBytes(StandardCharsets.UTF_8))) {
+        throw new ResponseStatusException(FORBIDDEN, "Invalid event join code");
+      }
+    } else if (team != null) {
+      if (team.getJoinCodeHash() == null || !encoder.matches(suppliedCode, team.getJoinCodeHash())) {
+        throw new ResponseStatusException(FORBIDDEN, "A valid team join code is required");
+      }
+    }
+    if (team == null) team = createOpenRegistrationTeam(name);
     if (team.getStatus() != TeamStatus.ACTIVE) throw new ResponseStatusException(FORBIDDEN, "This team is inactive");
-    if (sharedJoinCode.isEmpty() && team.getJoinCodeHash() != null && !encoder.matches(suppliedCode, team.getJoinCodeHash())) throw new ResponseStatusException(FORBIDDEN, "Invalid team join code");
     return new TeamDtos.TeamSessionResponse(tokens.issueTeamToken(team.getId()), TeamDtos.from(team));
   }
 
-  private Team createOpenRegistrationTeam(String name, String joinCode) {
+  private Team createOpenRegistrationTeam(String name) {
     if (!openRegistration) throw new ResponseStatusException(FORBIDDEN, "Team registration is closed");
-    return teams.save(new Team(name, joinCode == null || joinCode.isBlank() ? null : encoder.encode(joinCode)));
+    if (sharedJoinCode.isEmpty()) throw new ResponseStatusException(SERVICE_UNAVAILABLE, "Team joining is unavailable until the organizer configures APP_TEAM_JOIN_CODE");
+    return teams.save(new Team(name, null));
   }
 
   @Transactional(readOnly = true) public TeamDtos.TeamResponse currentTeam(String token) { return TeamDtos.from(requireTeam(tokens.requireTeam(token))); }

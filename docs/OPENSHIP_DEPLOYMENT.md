@@ -14,7 +14,10 @@ FRONTEND_BIND_ADDRESS=127.0.0.1
 FRONTEND_PORT=5173
 APP_CORS_ALLOWED_ORIGINS=https://silicon-rally.edder.studio
 OPEN_TEAM_REGISTRATION=true
+APP_TEAM_JOIN_CODE=replace-with-a-private-event-code
 ```
+
+Replace the example join code with a private code and share it with participants. The backend rejects name-only joins; registration being enabled does not bypass the join-code check.
 
 `OPEN_TEAM_REGISTRATION=false` deliberately makes a new-team request return 403.
 An existing inactive team or an incorrect join code also returns 403. These are

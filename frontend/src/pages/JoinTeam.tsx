@@ -35,7 +35,7 @@ export function JoinTeam() {
       <h2>Start a team session</h2>
       <form onSubmit={submit}>
         <label>Team name<input required autoFocus placeholder="e.g. Packet Pilots" value={teamName} onChange={(e) => setTeamName(e.target.value)} /></label>
-        <label>Event join code <small>Use the shared code from your event organizer</small><input autoComplete="one-time-code" placeholder="Enter the event code" value={joinCode} onChange={(e) => setJoinCode(e.target.value)} /></label>
+        <label>Event join code <small>Required — use the shared code from your event organizer</small><input required autoComplete="one-time-code" placeholder="Enter the event code" value={joinCode} onChange={(e) => setJoinCode(e.target.value)} /></label>
         <button className="button-primary" disabled={loading}>{loading ? "Joining rally…" : "Join rally"}<ArrowUpRight aria-hidden="true" size={17} /></button>
         {error && <p className="error" role="alert">{error}</p>}
       </form>
