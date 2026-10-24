@@ -12,7 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import static org.springframework.http.HttpStatus.*;
 
 /** Reserves one completion per actual team/mission, without recording points. */
-@RestController
+@RestController("wordScrambleCompletionController")
 @RequestMapping("/api/v1/games/word-scramble/completion")
 public class CompletionController {
   private final SessionTokenService tokens;
