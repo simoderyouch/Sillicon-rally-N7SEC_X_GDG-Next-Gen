@@ -53,11 +53,13 @@ describe('password validators', () => {
     expect(CHALLENGES).toHaveLength(20);
     expect(CHALLENGES.filter(item => item.tier === 'HARD')).toHaveLength(15);
     expect(CHALLENGES.filter(item => item.tier === 'EXPERT')).toHaveLength(5);
-    expect(TOTAL_SECONDS).toBe(525);
-    expect(CHALLENGES.filter(item => item.tier === 'HARD').reduce((sum, item) => sum + item.seconds, 0)).toBe(345);
-    expect(CHALLENGES.filter(item => item.tier === 'EXPERT').reduce((sum, item) => sum + item.seconds, 0)).toBe(180);
+    expect(TOTAL_SECONDS).toBe(827);
+    expect(CHALLENGES.filter(item => item.tier === 'HARD').reduce((sum, item) => sum + item.seconds, 0)).toBe(547);
+    expect(CHALLENGES.filter(item => item.tier === 'EXPERT').reduce((sum, item) => sum + item.seconds, 0)).toBe(280);
     expect(MAX_SCORE).toBe(100);
-    expect(CHALLENGES.map(item => item.seconds)).toEqual([18, 22, 22, 25, 16, 18, 18, 24, 25, 22, 30, 35, 25, 25, 20, 30, 30, 35, 40, 45]);
+    expect(CHALLENGES.slice(0, 15).every(item => item.tier === 'HARD')).toBe(true);
+    expect(CHALLENGES.slice(15).every(item => item.tier === 'EXPERT')).toBe(true);
+    expect(CHALLENGES.map(item => item.seconds)).toEqual([30, 35, 35, 40, 27, 30, 30, 40, 40, 35, 45, 50, 40, 40, 30, 50, 50, 55, 60, 65]);
   });
 
   it('accepts one valid password and rejects the boundary failures for every challenge', () => {

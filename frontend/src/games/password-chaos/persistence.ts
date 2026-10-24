@@ -2,14 +2,22 @@ import { CHALLENGES } from './challenges';
 import type { Outcome, Save } from './types';
 import { getTeamToken } from '../../teamSession';
 
-export function storageKey(missionId: string) {
+function scopedKey(version: number, missionId: string) {
   const token = getTeamToken() ?? 'preview';
-  return `rally:password-chaos:v2:${token}:${missionId}`;
+  return `rally:password-chaos:v${version}:${token}:${missionId}`;
+}
+
+export function storageKey(missionId: string) {
+  return scopedKey(3, missionId);
+}
+
+/** v1 used the retired 188-second limits. v2 used the retired 525-second limits. */
+export function retiredStorageKeys(missionId: string) {
+  return [scopedKey(1, missionId), scopedKey(2, missionId)];
 }
 
 export function legacyStorageKey(missionId: string) {
-  const token = getTeamToken() ?? 'preview';
-  return `rally:password-chaos:v1:${token}:${missionId}`;
+  return retiredStorageKeys(missionId)[0];
 }
 
 /** Move in-progress Password Chaos data from pre-durable player sessions. */
@@ -27,14 +35,17 @@ function readStored(key: string): string | null {
   return legacy;
 }
 
-/** Drop a session saved under the retired 188-second limits. Those deadlines cannot be mapped onto the current countdowns. */
+/** Drop sessions saved under retired timetables. Their deadlines cannot be mapped onto the current countdowns without extending later challenges or scoring speed against the wrong limit. */
 export function retireLegacySession(missionId: string) {
   try {
-    const legacy = legacyStorageKey(missionId);
-    if (!readStored(legacy)) return false;
-    localStorage.removeItem(legacy);
-    sessionStorage.removeItem(legacy);
-    return true;
+    let removed = false;
+    for (const legacy of retiredStorageKeys(missionId)) {
+      if (!readStored(legacy)) continue;
+      localStorage.removeItem(legacy);
+      sessionStorage.removeItem(legacy);
+      removed = true;
+    }
+    return removed;
   } catch {
     return false;
   }
