@@ -218,3 +218,21 @@ input, select { background: rgba(5, 2, 16, .67); border-color: rgba(170, 109, 25
 .cabinet-light { background: none; border-radius: 0; height: 14px; width: 14px; }
 .mission-card.is-completed { border-color: rgba(67, 243, 220, .78); box-shadow: inset 0 1px rgba(255,255,255,.08), 0 0 0 1px rgba(67, 243, 220, .12), 0 17px 45px rgba(0,0,0,.22); }
 .mission-status-completed { color: #54fbe3 !important; text-shadow: 0 0 10px rgba(67, 243, 220, .48); }
+.mission-card.is-completed,
+.mission-card.is-completed.is-ready:hover {
+  background: linear-gradient(145deg, rgba(20, 108, 82, .98), rgba(8, 67, 54, .98));
+  border-color: #43f3bc;
+  box-shadow: inset 0 0 0 1px rgba(180, 255, 222, .14), 0 0 24px rgba(67, 243, 188, .18);
+  cursor: not-allowed;
+  transform: none;
+}
+.mission-card.is-completed::after { background: linear-gradient(136deg, transparent 0 48%, rgba(143, 255, 206, .1) 49%, transparent 50%); }
+.mission-card.is-completed h2,
+.mission-card.is-completed p,
+.mission-card.is-completed .mission-number,
+.mission-card.is-completed .mission-card-bottom,
+.mission-card.is-completed .mission-card-bottom b,
+.mission-card.is-completed .mission-status { color: #e1fff1 !important; }
+.mission-card.is-completed .mission-index { color: #7fffc7; }
+.mission-card.is-completed .mission-card-bottom { border-top-color: rgba(180, 255, 222, .28); }
+.mission-card.is-completed .mission-locked { font-weight: 700; }
