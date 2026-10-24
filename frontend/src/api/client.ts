@@ -23,6 +23,7 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ teamName, joinCode }),
     }),
+  disconnectTeam: (token: string) => request<void>("/api/v1/team-sessions/current", { method: "DELETE", headers: { "X-Team-Token": token } }),
   missions: () => request<Mission[]>("/api/v1/missions"),
   myGameScores: (token: string) => request<GameScoreResponse[]>("/api/v1/my-scores", { headers: { "X-Team-Token": token } }),
   submitGameScore: (token: string, slug: string, payload: { score: number; completed: boolean; details?: Record<string, string | number | boolean> }) => request<GameScoreResponse>(`/api/v1/games/${slug}/score`, { method: "POST", headers: { "X-Team-Token": token }, body: JSON.stringify(payload) }),
