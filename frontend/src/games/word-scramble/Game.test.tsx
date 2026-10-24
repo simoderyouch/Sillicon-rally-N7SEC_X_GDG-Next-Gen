@@ -104,7 +104,7 @@ describe('word-scramble', async () => {
     expect(screen.getByLabelText('Votre réponse')).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Afficher un indice' })).toBeDisabled();
   });
-  it('separates team sessions and fails closed if storage cannot be written', () => {
+  it('separates team sessions and fails closed if storage cannot be written', async () => {
     localStorage.setItem('teamToken', 'team-a'); const a = model.storageKey(mission.id);
     localStorage.setItem('teamToken', 'team-b'); expect(model.storageKey(mission.id)).not.toBe(a);
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('Storage blocked'); });
