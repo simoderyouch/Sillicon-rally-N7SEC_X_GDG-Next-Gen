@@ -1,0 +1,7 @@
+# Optional environment overrides; the organiser's default flag is bundled only in backend Java.
+services:
+  backend:
+    environment:
+      FINAL_FLAG_CHALLENGE_FLAG: "${FINAL_FLAG_CHALLENGE_FLAG:-}"
+      FINAL_FLAG_CHALLENGE_MAX_ATTEMPTS: "${FINAL_FLAG_CHALLENGE_MAX_ATTEMPTS:-0}"
+      FINAL_FLAG_CHALLENGE_COOLDOWN_MS: "${FINAL_FLAG_CHALLENGE_COOLDOWN_MS:-3000}"
