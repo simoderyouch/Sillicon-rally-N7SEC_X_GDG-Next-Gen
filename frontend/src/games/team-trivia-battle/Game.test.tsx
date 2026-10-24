@@ -9,8 +9,8 @@ function fixture(): Snapshot {
   return { category: 'it', number: 1, answered: 0, rawScore: 0, score: 0, correctAnswers: 0, incorrectAnswers: 0, timeouts: 0, totalTimeMs: 0, rank: 'Keep Learning', serverNow: 1000, deadline: 46000, nextAt: 0, complete: false, handedOff: false, question: { id: 'it-1', text: 'Quel composant exécute les instructions ?', options: ['CPU', 'Écran', 'Clavier', 'Souris'], difficulty: 'easy' }, feedback: null, review: [] };
 }
 function mount(disabled = false, onComplete = vi.fn()) { return { ...render(<MemoryRouter><Component mission={mission} onComplete={onComplete} disabled={disabled} /></MemoryRouter>), onComplete }; }
-beforeEach(() => { sessionStorage.clear(); sessionStorage.setItem('teamToken', 'existing-team-token'); sessionStorage.setItem('teamName', 'Équipe Campus'); });
-afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.useRealTimers(); });
+beforeEach(() => { localStorage.clear(); sessionStorage.clear(); localStorage.setItem('teamToken', 'existing-team-token'); localStorage.setItem('teamName', 'Équipe Campus'); });
+afterEach(() => { cleanup(); localStorage.clear(); sessionStorage.clear(); vi.restoreAllMocks(); vi.useRealTimers(); });
 describe('Team Trivia Battle', () => {
   it('uses the existing session and offers exactly six categories before confirmation', async () => {
     vi.spyOn(triviaApi, 'state').mockResolvedValue(null);
@@ -92,7 +92,7 @@ describe('Team Trivia Battle', () => {
     vi.spyOn(triviaApi, 'state').mockResolvedValue(null);
     const view = mount(true); await screen.findByRole('button', { name: 'Choisir IT' });
     expect(screen.getByRole('button', { name: 'Choisir IT' })).toBeDisabled();
-    view.unmount(); sessionStorage.clear(); mount();
+    view.unmount(); localStorage.clear(); sessionStorage.clear(); mount();
     expect(screen.getByRole('heading', { name: 'La session d’équipe est nécessaire.' })).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });

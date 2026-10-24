@@ -4,6 +4,7 @@ import { shuffledStages, type Scenario } from './scenarios';
 import { screenshot } from './visuals';
 import './style.css';
 import { completionApi } from './completionApi';
+import { getTeamToken } from '../../teamSession';
 
 const names = { email: 'Enquête sur les e-mails', url: 'Investigation des URL', login: 'Pages de connexion' };
 function Evidence({ item }: { item: Scenario }) {
@@ -16,7 +17,7 @@ function Evidence({ item }: { item: Scenario }) {
   </dl></details>;
 }
 function Game({ mission, onComplete, disabled = false }: GameProps) {
-  const token = sessionStorage.getItem('teamToken');
+  const token = getTeamToken();
   const preview = mission.id === 'preview' && !token;
   const [checked, setChecked] = useState(preview);
   const [savedScore, setSavedScore] = useState<number | null>(null);

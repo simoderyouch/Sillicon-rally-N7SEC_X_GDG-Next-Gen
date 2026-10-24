@@ -2,11 +2,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { triviaApi, categories, type CategoryId, type Snapshot } from './gameApi';
 import type { GameDefinition, GameProps } from '../types';
+import { getTeamName, getTeamToken } from '../../teamSession';
 import './trivia.css';
 
 function Trivia({ mission, onComplete, disabled = false }: GameProps) {
-  const token = sessionStorage.getItem('teamToken');
-  const teamName = sessionStorage.getItem('teamName');
+  const token = getTeamToken();
+  const teamName = getTeamName();
   const [view, setView] = useState<{ state: Snapshot | null; received: number } | null>(null);
   const [selection, setSelection] = useState<CategoryId | null>(null);
   const [busy, setBusy] = useState(false);

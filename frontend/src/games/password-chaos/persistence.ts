@@ -1,21 +1,38 @@
 import { CHALLENGES } from './challenges';
 import type { Outcome, Save } from './types';
+import { getTeamToken } from '../../teamSession';
 
 export function storageKey(missionId: string) {
-  const token = sessionStorage.getItem('teamToken') ?? 'preview';
+  const token = getTeamToken() ?? 'preview';
   return `rally:password-chaos:v2:${token}:${missionId}`;
 }
 
 export function legacyStorageKey(missionId: string) {
-  const token = sessionStorage.getItem('teamToken') ?? 'preview';
+  const token = getTeamToken() ?? 'preview';
   return `rally:password-chaos:v1:${token}:${missionId}`;
+}
+
+/** Move in-progress Password Chaos data from pre-durable player sessions. */
+function readStored(key: string): string | null {
+  const persistent = localStorage.getItem(key);
+  if (persistent !== null) return persistent;
+  const legacy = sessionStorage.getItem(key);
+  if (legacy === null) return null;
+  try {
+    localStorage.setItem(key, legacy);
+    sessionStorage.removeItem(key);
+  } catch {
+    // Retain the legacy session when persistent browser storage is unavailable.
+  }
+  return legacy;
 }
 
 /** Drop a session saved under the retired 188-second limits. Those deadlines cannot be mapped onto the current countdowns. */
 export function retireLegacySession(missionId: string) {
   try {
     const legacy = legacyStorageKey(missionId);
-    if (!sessionStorage.getItem(legacy)) return false;
+    if (!readStored(legacy)) return false;
+    localStorage.removeItem(legacy);
     sessionStorage.removeItem(legacy);
     return true;
   } catch {
@@ -50,14 +67,14 @@ export function parseSave(raw: string | null): Save | null {
 
 export function readSave(key: string) {
   try {
-    return parseSave(sessionStorage.getItem(key));
+    return parseSave(readStored(key));
   } catch {
     return null;
   }
 }
 
 export function writeSave(key: string, save: Save) {
-  sessionStorage.setItem(key, JSON.stringify(save));
+  localStorage.setItem(key, JSON.stringify(save));
   return save;
 }
 

@@ -15,8 +15,8 @@ function answer(value: string) {
   fireEvent.click(screen.getByRole('button', { name: 'Validate' }));
 }
 
-beforeEach(() => { sessionStorage.clear(); vi.useFakeTimers(); });
-afterEach(() => { cleanup(); vi.useRealTimers(); sessionStorage.clear(); });
+beforeEach(() => { localStorage.clear(); sessionStorage.clear(); vi.useFakeTimers(); });
+afterEach(() => { cleanup(); vi.useRealTimers(); localStorage.clear(); sessionStorage.clear(); });
 
 describe('Password Chaos', () => {
   it('is discovered by the game registry', () => {
@@ -72,11 +72,11 @@ describe('Password Chaos', () => {
   });
 
   it('does not resume a session saved with the retired time limits', () => {
-    sessionStorage.setItem(legacyStorageKey(mission.id), JSON.stringify({ phase: 'playing', index: 4, deadline: Date.now() + 1000, outcomes: [], draft: '11111000', handedOff: false, startedAt: Date.now(), finishedAt: null }));
+    localStorage.setItem(legacyStorageKey(mission.id), JSON.stringify({ phase: 'playing', index: 4, deadline: Date.now() + 1000, outcomes: [], draft: '11111000', handedOff: false, startedAt: Date.now(), finishedAt: null }));
     render(<Component mission={mission} onComplete={vi.fn()} />);
     expect(screen.getByRole('status')).toHaveTextContent(/retired time limits/);
     expect(screen.getByRole('button', { name: 'Start' })).toBeInTheDocument();
-    expect(sessionStorage.getItem(legacyStorageKey(mission.id))).toBeNull();
+    expect(localStorage.getItem(legacyStorageKey(mission.id))).toBeNull();
   });
 
   it('waits to submit while the platform has disabled the game', () => {
