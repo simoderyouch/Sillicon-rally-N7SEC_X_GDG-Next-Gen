@@ -34,9 +34,9 @@ describe("code-breaker game", () => {
     render(<Component mission={mission} onComplete={onComplete} />);
 
     await ready();
-    enter("Comet", "Orbit", "Spark"); await nextRound();
-    enter("Spark", "Moon", "Orbit"); await nextRound();
-    enter("Moon", "Bolt", "Moon", "Leaf", "Orbit");
+    enter("Moon", "Comet", "Cube"); await nextRound();
+    enter("Bolt", "Spark", "Cube"); await nextRound();
+    enter("Orbit", "Bolt", "Wave", "Comet", "Moon");
     await waitFor(() => expect(screen.getByText("Sequence cracked.")).toBeInTheDocument());
     fireEvent.click(screen.getByRole("button", { name: /dispatch result/i }));
 

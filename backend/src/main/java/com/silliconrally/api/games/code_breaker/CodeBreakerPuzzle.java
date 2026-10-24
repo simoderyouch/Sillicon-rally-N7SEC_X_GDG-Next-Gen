@@ -11,9 +11,9 @@ public final class CodeBreakerPuzzle {
   private static final List<String> SYMBOLS = List.of("comet", "orbit", "spark", "leaf", "wave", "cube", "moon", "bolt");
   private static final int[] LENGTHS = {3, 3, 5};
   private static final List<List<String>> ANSWERS = List.of(
-    List.of("comet", "orbit", "spark"),
-    List.of("spark", "moon", "orbit"),
-    List.of("moon", "bolt", "moon", "leaf", "orbit")
+    List.of("moon", "comet", "cube"),
+    List.of("bolt", "spark", "cube"),
+    List.of("orbit", "bolt", "wave", "comet", "moon")
   );
 
   public record Feedback(int exact, int shifted, int absent) { }
