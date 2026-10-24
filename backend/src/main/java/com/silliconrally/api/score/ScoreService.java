@@ -30,6 +30,14 @@ public class ScoreService {
     return ScoreDtos.from(saved);
   }
 
+  @Transactional(readOnly = true)
+  public List<ScoreDtos.ScoreResponse> myScores(String teamToken) {
+    Team team = teams.findById(tokens.requireTeam(teamToken))
+        .orElseThrow(() -> new ResponseStatusException(UNAUTHORIZED, "Team session is no longer valid"));
+    if (team.getStatus() != TeamStatus.ACTIVE) throw new ResponseStatusException(FORBIDDEN, "This team is inactive");
+    return scores.findAllByTeamOrderBySubmittedAtDesc(team).stream().map(ScoreDtos::from).toList();
+  }
+
   private GameScore updateIfImproved(GameScore existing, ScoreDtos.SubmitScoreRequest request) {
     if (request.score() >= existing.getScore()) existing.update(request.score(), request.completed() || existing.isCompleted());
     return existing;
