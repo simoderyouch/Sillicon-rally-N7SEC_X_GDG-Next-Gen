@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,7 @@ public class BuiltInGameMissionRegistrar {
   private final MissionRepository missions;
   private final List<String> gameSlugs;
 
+  @Autowired
   public BuiltInGameMissionRegistrar(MissionRepository missions, ResourceLoader resources) {
     this(missions, readCatalog(resources));
   }
