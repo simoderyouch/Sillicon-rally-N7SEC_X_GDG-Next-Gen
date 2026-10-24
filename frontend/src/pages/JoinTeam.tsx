@@ -17,7 +17,7 @@ export function JoinTeam() {
     try {
       const session = await api.joinTeam(teamName.trim(), joinCode || undefined);
       saveTeamSession(session.token, session.team.displayName);
-      navigate("/games");
+      navigate("/games", { state: { teamJoined: true } });
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not join team");
     } finally { setLoading(false); }

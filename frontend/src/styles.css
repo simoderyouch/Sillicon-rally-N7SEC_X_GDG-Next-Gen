@@ -236,3 +236,7 @@ input, select { background: rgba(5, 2, 16, .67); border-color: rgba(170, 109, 25
 .mission-card.is-completed .mission-index { color: #7fffc7; }
 .mission-card.is-completed .mission-card-bottom { border-top-color: rgba(180, 255, 222, .28); }
 .mission-card.is-completed .mission-locked { font-weight: 700; }
+.team-welcome { align-items: center; background: linear-gradient(100deg, rgba(11, 93, 68, .58), rgba(8, 45, 38, .48)); border: 1px solid rgba(83, 255, 183, .42); border-radius: 8px 16px 8px 16px; box-shadow: 0 0 22px rgba(40, 220, 143, .1); color: #d8ffec; display: flex; gap: 11px; margin: -10px 0 22px; padding: 13px 16px; }
+.team-welcome svg { color: #65ffc0; flex: 0 0 auto; }
+.team-welcome strong { color: #8cffca; margin-right: 4px; }
+.team-badge small { color: #77ffc0; }
