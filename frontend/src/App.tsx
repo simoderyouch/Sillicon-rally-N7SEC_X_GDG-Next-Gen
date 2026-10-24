@@ -6,8 +6,10 @@ import { GameList } from "./pages/GameList";
 import { GameRunner } from "./pages/GameRunner";
 import { JoinTeam } from "./pages/JoinTeam";
 import { Leaderboard } from "./pages/Leaderboard";
+import { getTeamSession } from "./teamSession";
 
 export default function App() {
+  const hasTeamSession = Boolean(getTeamSession());
   return (
     <main className="app-shell">
       <header className="site-header">
@@ -16,7 +18,7 @@ export default function App() {
           <span><strong>Sillicon Rally</strong><em>Challenge Grid</em></span>
         </Link>
         <nav className="main-nav" aria-label="Main navigation">
-          <NavLink to="/play"><Sparkles size={14} /> Join challenge</NavLink>
+          {hasTeamSession ? <NavLink to="/games"><Sparkles size={14} /> Games</NavLink> : <NavLink to="/play"><Sparkles size={14} /> Join challenge</NavLink>}
           <NavLink to="/leaderboard"><Trophy size={14} /> Scoreboard</NavLink>
           <NavLink to="/admin"><ShieldCheck size={14} /> Admin shell</NavLink>
         </nav>
@@ -25,8 +27,8 @@ export default function App() {
       <div className="route-line" aria-hidden="true"><i /><i /><i /><i /></div>
       <div className="page-content">
         <Routes>
-          <Route path="/" element={<Navigate to="/play" replace />} />
-          <Route path="/play" element={<JoinTeam />} />
+          <Route path="/" element={<Navigate to={hasTeamSession ? "/games" : "/play"} replace />} />
+          <Route path="/play" element={hasTeamSession ? <Navigate to="/games" replace /> : <JoinTeam />} />
           <Route path="/games" element={<GameList />} />
           <Route path="/games/:slug" element={<GameRunner />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
