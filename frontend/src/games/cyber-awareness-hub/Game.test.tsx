@@ -1,9 +1,15 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { game } from './index';
+import { completionApi } from './completionApi';
 import * as data from './scenarios';
 import { screenshot } from './visuals';
 const mission = { id: 'cyber', slug: 'cyber-awareness-hub', title: 'Phishing Detective', description: '', maxScore: 100, releaseState: 'PUBLISHED' as const };
+beforeEach(() => {
+  sessionStorage.clear(); sessionStorage.setItem('teamToken', 'platform-team-token');
+  vi.spyOn(completionApi, 'state').mockResolvedValue({ locked: false, score: null, claimed: false });
+  vi.spyOn(completionApi, 'claim').mockImplementation(async (_, score) => ({ locked: true, score, claimed: true }));
+});
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 describe('Phishing Detective', () => {
   it('contains exactly the required distribution, safe simulations, and valid vector screenshots', () => {
@@ -35,11 +41,11 @@ describe('Phishing Detective', () => {
     expect(shuffled.slice(9).every(s => s.category === 'login')).toBe(true);
     shuffled.forEach(s => expect(s).toBe(data.scenarios.find(original => original.id === s.id)));
   });
-  it.each([0, 6, 7, 12])('plays all stages and hands off %s correct answers exactly once', (numberCorrect) => {
+  it.each([0, 6, 7, 12])('plays all stages and hands off %s correct answers exactly once', async (numberCorrect) => {
     vi.spyOn(data, 'shuffledStages').mockReturnValue(data.scenarios);
     const complete = vi.fn(); const Component = game.component;
     render(<Component mission={mission} onComplete={complete} />);
-    fireEvent.click(screen.getByRole('button', { name: /Commencer/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /Commencer/ }));
     expect(screen.getByRole('button', { name: 'Valider ma réponse' })).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: /Agrandir/ }));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -57,19 +63,45 @@ describe('Phishing Detective', () => {
     });
     const score = Math.round(numberCorrect / 12 * 100);
     expect(screen.getByText(`${score}/100`)).toBeInTheDocument();
-    expect(screen.getByText(data.scenarios[0].evidence)).toBeInTheDocument();
-    expect(document.querySelectorAll('.pd-review > details')).toHaveLength(12);
+    expect(screen.queryByText(data.scenarios[0].evidence)).not.toBeInTheDocument();
+    expect(document.querySelectorAll('.pd-review > details')).toHaveLength(0);
     expect(document.querySelector('input')).toBeNull();
     expect(document.querySelector('a')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Transmettre mon score' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Résultat transmis' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Résultat transmis' }));
     expect(complete).toHaveBeenCalledTimes(1);
     expect(complete).toHaveBeenCalledWith({ score, completed: true, details: { correct: numberCorrect, total: 12, accuracy: score, rawScore: score } });
   });
-  it('respects disabled state', () => {
+  it('respects disabled state', async () => {
     const Component = game.component;
     render(<Component mission={mission} disabled onComplete={vi.fn()} />);
-    expect(screen.getByRole('button', { name: /Commencer/ })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: /Commencer/ })).toBeDisabled();
   });
 });
 
+
+describe('completed team lock', () => {
+  it('keeps a submitted team on its score screen after reopening and session renewal', async () => {
+    vi.mocked(completionApi.state).mockResolvedValue({ locked: true, score: 75, claimed: false });
+    const Component = game.component; const onComplete = vi.fn();
+    const view = render(<Component mission={mission} onComplete={onComplete} />);
+    expect(await screen.findByText('75/100')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Commencer|Rejouer|Réactiver|Recommencer/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Résultat transmis' })).toBeDisabled();
+    view.unmount(); sessionStorage.setItem('teamToken', 'renewed-platform-token');
+    render(<Component mission={mission} onComplete={onComplete} />);
+    expect(await screen.findByText('75/100')).toBeInTheDocument();
+    expect(completionApi.state).toHaveBeenLastCalledWith('renewed-platform-token');
+    expect(onComplete).not.toHaveBeenCalled();
+  });
+  it('does not emit another completion when another tab already reserved the result', async () => {
+    // An already completed team is blocked before any question is displayed.
+    vi.mocked(completionApi.state).mockResolvedValue({ locked: true, score: 50, claimed: false });
+    const Component = game.component; const onComplete = vi.fn();
+    render(<Component mission={mission} onComplete={onComplete} />);
+    await screen.findByText('50/100');
+    fireEvent.click(screen.getByRole('button', { name: 'Résultat transmis' }));
+    expect(completionApi.claim).not.toHaveBeenCalled();
+    expect(onComplete).not.toHaveBeenCalled();
+  });
+});
