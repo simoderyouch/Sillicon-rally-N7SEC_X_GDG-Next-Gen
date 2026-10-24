@@ -53,11 +53,11 @@ describe('password validators', () => {
     expect(CHALLENGES).toHaveLength(20);
     expect(CHALLENGES.filter(item => item.tier === 'HARD')).toHaveLength(15);
     expect(CHALLENGES.filter(item => item.tier === 'EXPERT')).toHaveLength(5);
-    expect(TOTAL_SECONDS).toBe(525);
-    expect(CHALLENGES.filter(item => item.tier === 'HARD').reduce((sum, item) => sum + item.seconds, 0)).toBe(345);
-    expect(CHALLENGES.filter(item => item.tier === 'EXPERT').reduce((sum, item) => sum + item.seconds, 0)).toBe(180);
+    expect(TOTAL_SECONDS).toBe(810);
+    expect(CHALLENGES.filter(item => item.tier === 'HARD').reduce((sum, item) => sum + item.seconds, 0)).toBe(555);
+    expect(CHALLENGES.filter(item => item.tier === 'EXPERT').reduce((sum, item) => sum + item.seconds, 0)).toBe(255);
     expect(MAX_SCORE).toBe(100);
-    expect(CHALLENGES.map(item => item.seconds)).toEqual([18, 22, 22, 25, 16, 18, 18, 24, 25, 22, 30, 35, 25, 25, 20, 30, 30, 35, 40, 45]);
+    expect(CHALLENGES.map(item => item.seconds)).toEqual([30, 35, 35, 40, 30, 30, 30, 40, 40, 35, 45, 50, 40, 40, 35, 45, 45, 50, 55, 60]);
   });
 
   it('accepts one valid password and rejects the boundary failures for every challenge', () => {

@@ -8,7 +8,7 @@ Press **Start**. The briefing does not use challenge time. Each challenge shows 
 
 The deadline is an absolute timestamp in `localStorage`, keyed by team token and mission id: `rally:password-chaos:v2:{teamToken}:{missionId}`. Reloading or restarting the browser restores the active challenge and the remaining time. Time spent with the page closed still expires challenges, including several in a row.
 
-If every countdown runs out, the session lasts 525 seconds (8 minutes 45 seconds): 345 seconds across the HARD challenges and 180 seconds across EXPERT. A correct password still starts the next challenge immediately.
+If every countdown runs out, the session lasts 810 seconds (13 minutes 30 seconds): 555 seconds across the HARD challenges and 255 seconds across EXPERT. A correct password still starts the next challenge immediately.
 
 Sessions saved as `v1` used the retired shorter limits. Those deadlines are not resumed. Opening the game removes the old record and shows the briefing, with a note that the previous attempt was not continued. A `v2` session already in progress is left as it is.
 

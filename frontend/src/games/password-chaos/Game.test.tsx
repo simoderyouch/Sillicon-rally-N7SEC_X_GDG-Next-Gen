@@ -30,7 +30,7 @@ describe('Password Chaos', () => {
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument();
     start();
     expect(screen.getByRole('heading', { name: 'Digital Equation' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Time remaining')).toHaveTextContent('18.0');
+    expect(screen.getByLabelText('Time remaining')).toHaveTextContent('30.0');
     answer('nope');
     expect(screen.getByRole('status')).toHaveTextContent(/not met/);
     expect(screen.getByRole('heading', { name: 'Digital Equation' })).toBeInTheDocument();
@@ -49,7 +49,7 @@ describe('Password Chaos', () => {
     view.unmount();
     render(<Component mission={mission} onComplete={complete} />);
     expect(screen.getByRole('heading', { name: 'Prime Hunter' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Time remaining')).toHaveTextContent('19.0');
+    expect(screen.getByLabelText('Time remaining')).toHaveTextContent('32.0');
     advance(CHALLENGES[1].seconds * 1000);
     expect(screen.getByRole('heading', { name: 'Product 24' })).toBeInTheDocument();
     expect(screen.getByText(/Score/).querySelector('strong')).toHaveTextContent('4.00');

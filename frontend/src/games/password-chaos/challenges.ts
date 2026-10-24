@@ -5,7 +5,7 @@ const expert = { tier: 'EXPERT' as const, base: 4, bonus: 4 };
 
 export const CHALLENGES: Challenge[] = [
   {
-    id: 1, title: 'Digital Equation', seconds: 18, ...hard(), length: { exact: 8 },
+    id: 1, title: 'Digital Equation', seconds: 30, ...hard(), length: { exact: 8 },
     rules: [
       { id: 'length', label: 'Exactly 8 characters.' },
       { id: 'upper', label: 'Exactly 2 uppercase letters.' },
@@ -14,7 +14,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 2, title: 'Prime Hunter', seconds: 22, ...hard(), length: { min: 6, max: 9 },
+    id: 2, title: 'Prime Hunter', seconds: 35, ...hard(), length: { min: 6, max: 9 },
     rules: [
       { id: 'length', label: 'Between 6 and 9 characters.' },
       { id: 'prime-pair', label: 'Exactly 2 consecutive digits forming a two-digit prime.' },
@@ -23,7 +23,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 3, title: 'Product 24', seconds: 22, ...hard(), length: { exact: 7 },
+    id: 3, title: 'Product 24', seconds: 35, ...hard(), length: { exact: 7 },
     rules: [
       { id: 'length', label: 'Exactly 7 characters.' },
       { id: 'digits', label: 'Exactly 3 numeric digits.' },
@@ -33,7 +33,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 4, title: 'Palindrome Lock', seconds: 25, ...hard(), length: { exact: 7 },
+    id: 4, title: 'Palindrome Lock', seconds: 40, ...hard(), length: { exact: 7 },
     rules: [
       { id: 'length', label: 'Exactly 7 characters.' },
       { id: 'palindrome', label: 'Contains a consecutive three-letter palindrome.' },
@@ -42,7 +42,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 5, title: 'Binary Puzzle', seconds: 16, ...hard(), length: { exact: 8 },
+    id: 5, title: 'Binary Puzzle', seconds: 30, ...hard(), length: { exact: 8 },
     rules: [
       { id: 'length', label: 'Exactly 8 characters.' },
       { id: 'binary', label: 'Only "0" and "1" allowed.' },
@@ -51,7 +51,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 6, title: 'Alphabet Cipher', seconds: 18, ...hard(), length: { exact: 6 },
+    id: 6, title: 'Alphabet Cipher', seconds: 30, ...hard(), length: { exact: 6 },
     rules: [
       { id: 'length', label: 'Exactly 6 characters.' },
       { id: 'letters', label: 'First four characters are distinct lowercase letters in strictly increasing alphabetical order.' },
@@ -59,7 +59,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 7, title: 'Roman Code', seconds: 18, ...hard(), length: { exact: 8 },
+    id: 7, title: 'Roman Code', seconds: 30, ...hard(), length: { exact: 8 },
     rules: [
       { id: 'length', label: 'Exactly 8 characters.' },
       { id: 'prefix', label: 'Starts with "XIV".' },
@@ -69,7 +69,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 8, title: 'Odd & Even', seconds: 24, ...hard(), length: { exact: 4 },
+    id: 8, title: 'Odd & Even', seconds: 40, ...hard(), length: { exact: 4 },
     rules: [
       { id: 'length', label: 'Exactly 4 characters, all numeric digits.' },
       { id: 'distinct', label: 'All digits distinct.' },
@@ -78,7 +78,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 9, title: 'Prime Twins', seconds: 25, ...hard(), length: { exact: 5 },
+    id: 9, title: 'Prime Twins', seconds: 40, ...hard(), length: { exact: 5 },
     rules: [
       { id: 'format', label: 'Exact format DD@DD.' },
       { id: 'primes', label: 'Both two-digit numbers are prime.' },
@@ -86,7 +86,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 10, title: 'Mirror Code', seconds: 22, ...hard(), length: { exact: 7 },
+    id: 10, title: 'Mirror Code', seconds: 35, ...hard(), length: { exact: 7 },
     rules: [
       { id: 'length', label: 'Exactly 7 characters.' },
       { id: 'palindrome', label: 'Entire password is a character-for-character palindrome.' },
@@ -95,7 +95,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 11, title: 'GDG Protocol', seconds: 30, ...hard(), length: { exact: 12 },
+    id: 11, title: 'GDG Protocol', seconds: 45, ...hard(), length: { exact: 12 },
     rules: [
       { id: 'length', label: 'Exactly 12 characters.' },
       { id: 'gdg', label: 'Must contain uppercase "GDG".' },
@@ -104,7 +104,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 12, title: 'N7SEC Cipher', seconds: 35, ...hard(), length: { exact: 14 },
+    id: 12, title: 'N7SEC Cipher', seconds: 50, ...hard(), length: { exact: 14 },
     rules: [
       { id: 'length', label: 'Exactly 14 characters.' },
       { id: 'token', label: 'Must contain uppercase "N7SEC".' },
@@ -114,7 +114,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 13, title: 'Equal Halves', seconds: 25, ...hard(), length: { exact: 9 },
+    id: 13, title: 'Equal Halves', seconds: 40, ...hard(), length: { exact: 9 },
     rules: [
       { id: 'format', label: 'Exact format LLDD-LLDD.' },
       { id: 'letters', label: 'All four letters must be distinct.' },
@@ -122,7 +122,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 14, title: 'Checksum', seconds: 25, ...hard(), length: { exact: 6 },
+    id: 14, title: 'Checksum', seconds: 40, ...hard(), length: { exact: 6 },
     rules: [
       { id: 'format', label: 'Exact format DDDDD!.' },
       { id: 'check', label: 'Last digit equals the sum of the first four digits modulo 10.' },
@@ -130,7 +130,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 15, title: 'Reverse Letters', seconds: 20, ...hard(), length: { exact: 7 },
+    id: 15, title: 'Reverse Letters', seconds: 35, ...hard(), length: { exact: 7 },
     rules: [
       { id: 'format', label: 'Exact format ABC@CBA.' },
       { id: 'distinct', label: 'A, B, and C must be three distinct uppercase letters.' },
@@ -138,7 +138,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 16, title: 'Square Logic', seconds: 30, ...expert, length: { exact: 7 },
+    id: 16, title: 'Square Logic', seconds: 45, ...expert, length: { exact: 7 },
     rules: [
       { id: 'format', label: 'Exact format DD#DD!.' },
       { id: 'squares', label: 'Both two-digit numbers are perfect squares.' },
@@ -146,7 +146,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 17, title: 'Ascending Product', seconds: 30, ...expert, length: { exact: 5 },
+    id: 17, title: 'Ascending Product', seconds: 45, ...expert, length: { exact: 5 },
     rules: [
       { id: 'format', label: 'Exact format UDDD!.' },
       { id: 'order', label: 'The three digits are strictly increasing.' },
@@ -155,7 +155,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 18, title: 'Vowel Cipher', seconds: 35, ...expert, length: { exact: 9 },
+    id: 18, title: 'Vowel Cipher', seconds: 50, ...expert, length: { exact: 9 },
     rules: [
       { id: 'format', label: 'Exact format LLLLLLDD#.' },
       { id: 'letters', label: 'Exactly six lowercase letters.' },
@@ -166,7 +166,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 19, title: 'Final Equation', seconds: 40, ...expert, length: { exact: 5 },
+    id: 19, title: 'Final Equation', seconds: 55, ...expert, length: { exact: 5 },
     rules: [
       { id: 'format', label: 'Exact format DDDD!.' },
       { id: 'range', label: 'All four digits must be distinct integers from 1 through 9.' },
@@ -175,7 +175,7 @@ export const CHALLENGES: Challenge[] = [
     ],
   },
   {
-    id: 20, title: 'Ultimate Password', seconds: 45, ...expert, length: { exact: 14 },
+    id: 20, title: 'Ultimate Password', seconds: 60, ...expert, length: { exact: 14 },
     rules: [
       { id: 'length', label: 'Exactly 14 characters.' },
       { id: 'gdg', label: 'Contains uppercase "GDG".' },
