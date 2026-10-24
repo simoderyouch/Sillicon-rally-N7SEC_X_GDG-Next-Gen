@@ -13,10 +13,12 @@ export const words = [
 
 export type Round = { word: string; scrambled: string; hintUsed: boolean; wrongAttempts: number; solved: boolean };
 export type Run = { version: 1; id: string; rounds: Round[]; submitted: boolean };
+export const MAX_ATTEMPTS = 3;
+export const isDone = (round: Round) => round.solved || round.wrongAttempts >= MAX_ATTEMPTS;
 export const points = (round: Round) => !round.solved ? 0 : round.hintUsed ? round.wrongAttempts > 0 ? 3 : 7 : round.wrongAttempts > 0 ? 5 : 10;
 export const score = (run: Run) => run.rounds.reduce((sum, round) => sum + points(round), 0);
 export const hintsRemaining = (run: Run) => 3 - run.rounds.filter(round => round.hintUsed).length;
-export const currentIndex = (run: Run) => run.rounds.findIndex(round => !round.solved);
+export const currentIndex = (run: Run) => run.rounds.findIndex(round => !isDone(round));
 function shuffle<T>(items: readonly T[], random: () => number): T[] {
   const result = [...items];
   for (let i = result.length - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [result[i], result[j]] = [result[j], result[i]]; }
@@ -43,8 +45,8 @@ export function readRun(key: string): Run | null {
       && typeof round.hintUsed === 'boolean' && typeof round.solved === 'boolean'
       && Number.isSafeInteger(round.wrongAttempts) && round.wrongAttempts >= 0)
     && hintsRemaining(run) >= 0
-    && run.rounds.every((round, i) => !round.solved || run.rounds.slice(0, i).every(previous => previous.solved))
-    && run.rounds.every((round, i) => round.solved || i === currentIndex(run) || (!round.hintUsed && round.wrongAttempts === 0))
+    && run.rounds.every((round, i) => !isDone(round) || run.rounds.slice(0, i).every(isDone))
+    && run.rounds.every((round, i) => isDone(round) || i === currentIndex(run) || (!round.hintUsed && round.wrongAttempts === 0))
     && (!run.submitted || currentIndex(run) === -1);
   if (!valid) throw new Error('La sauvegarde est invalide. Recommencez une nouvelle partie.');
   return run;
