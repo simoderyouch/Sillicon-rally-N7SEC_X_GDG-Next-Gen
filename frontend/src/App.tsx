@@ -1,4 +1,4 @@
-import { Link, NavLink, Navigate, Route, Routes } from "react-router-dom";
+import { Link, NavLink, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Radio, ShieldCheck, Sparkles, Trophy } from "lucide-react";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminLogin } from "./pages/AdminLogin";
@@ -8,9 +8,10 @@ import { JoinTeam } from "./pages/JoinTeam";
 import { Leaderboard } from "./pages/Leaderboard";
 
 export default function App() {
+  const home = useLocation().pathname === "/play";
   return (
-    <main className="app-shell">
-      <header className="site-header">
+    <main className={home ? "app-shell app-shell--home" : "app-shell"}>
+      {home ? null : <header className="site-header">
         <Link to="/" className="brand" aria-label="Sillicon Rally challenge home">
           <span className="brand-mark" aria-hidden="true"><Sparkles size={18} strokeWidth={2.4} /></span>
           <span><strong>Sillicon Rally</strong><em>Challenge Grid</em></span>
@@ -21,9 +22,9 @@ export default function App() {
           <NavLink to="/admin"><ShieldCheck size={14} /> Admin shell</NavLink>
         </nav>
         <span className="system-state"><Radio size={13} /> Live challenge</span>
-      </header>
-      <div className="route-line" aria-hidden="true"><i /><i /><i /><i /></div>
-      <div className="page-content">
+      </header>}
+      {home ? null : <div className="route-line" aria-hidden="true"><i /><i /><i /><i /></div>}
+      <div className={home ? "page-content page-content--home" : "page-content"}>
         <Routes>
           <Route path="/" element={<Navigate to="/play" replace />} />
           <Route path="/play" element={<JoinTeam />} />
@@ -34,7 +35,7 @@ export default function App() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
       </div>
-      <footer className="site-footer"><span>Authorised training environment</span><span>Observe. Verify. Defend.</span></footer>
+      {home ? null : <footer className="site-footer"><span>Authorised training environment</span><span>Observe. Verify. Defend.</span></footer>}
     </main>
   );
 }

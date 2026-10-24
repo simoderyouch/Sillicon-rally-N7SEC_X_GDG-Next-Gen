@@ -1,0 +1,67 @@
+.algo-game { --ink: #172033; --muted: #52627a; --card: #f6f8fb; --line: #d5deea; color: var(--ink); background: var(--card); border-radius: 16px; padding: 16px 16px 20px; }
+.algo-game * { box-sizing: border-box; }
+.algo-top, .algo-level-head, .algo-controls, .algo-row, .algo-palette, .algo-progress { display: flex; align-items: center; gap: 10px; }
+.algo-top { justify-content: space-between; flex-wrap: wrap; margin-bottom: 12px; }
+.algo-kicker { margin: 0; color: #6d5efc; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+.algo-game h2, .algo-game h3, .algo-game p { margin: 0; }
+.algo-game h2 { font-size: 1.35rem; }
+.algo-clock { font: 700 1.4rem/1 ui-monospace, monospace; color: #123; background: white; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
+.algo-score { color: var(--muted); }
+.algo-score strong { color: var(--ink); }
+.algo-progress { list-style: none; padding: 0; margin: 0 0 12px; flex-wrap: wrap; }
+.algo-progress button { min-width: 52px; border: 1px solid var(--line); background: white; border-radius: 10px; padding: 6px 8px; cursor: pointer; color: var(--ink); }
+.algo-progress button[aria-current='step'] { border-color: #3d6bff; box-shadow: 0 0 0 2px rgba(61, 107, 255, .2); }
+.algo-progress button:disabled { cursor: default; opacity: .45; }
+.algo-progress b, .algo-progress span { display: block; }
+.algo-progress span { color: var(--muted); font-size: 11px; font-weight: 500; }
+.algo-layout { display: grid; grid-template-columns: minmax(240px, 1.1fr) minmax(280px, .9fr); gap: 16px; align-items: start; }
+.algo-level-head { margin-bottom: 8px; }
+.algo-badge { border-radius: 999px; padding: 2px 8px; font-size: 12px; color: white; }
+.algo-badge.easy { background: #1f9d55; }
+.algo-badge.medium { background: #e07a12; }
+.algo-badge.hard { background: #d23b4a; }
+.algo-board { background: #4d5d73; border-radius: 12px; padding: 10px; }
+.algo-grid { display: grid; gap: 4px; }
+.algo-cell { position: relative; aspect-ratio: 1; border-radius: 5px; background: rgba(255, 255, 255, .04); display: grid; place-items: center; }
+.algo-cell.red { background: #ff5d6c; }
+.algo-cell.orange { background: #ff9f43; }
+.algo-cell.cyan { background: #3ecfe0; }
+.algo-star { color: white; font-size: clamp(16px, 2vw, 26px); text-shadow: 0 1px 0 rgba(0, 0, 0, .25); }
+.algo-star.got { opacity: .35; }
+.algo-robot { position: absolute; width: 46%; height: 46%; background: #151922; clip-path: polygon(50% 6%, 90% 90%, 10% 90%); filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .3)); }
+@media (prefers-reduced-motion: no-preference) { .algo-robot.moving { transition: transform .16s linear; } }
+.algo-hint, .algo-help, .algo-status { color: var(--muted); font-size: .92rem; line-height: 1.4; }
+.algo-hint { margin-top: 8px; }
+.algo-side { display: grid; gap: 10px; }
+.algo-controls { justify-content: space-between; }
+.algo-pointer { font: 700 1.2rem/1 ui-monospace, monospace; }
+.algo-speeds { display: flex; border: 1px solid #7aa2ff; border-radius: 8px; overflow: hidden; }
+.algo-speeds button, .algo-cmd, .algo-slot, .algo-reset, .algo-color { font: 600 13px/1.2 ui-sans-serif, system-ui, sans-serif; }
+.algo-speeds button { border: 0; background: white; color: #2454d6; padding: 8px 10px; cursor: pointer; }
+.algo-speeds button[aria-pressed='true'] { background: #2f6bff; color: white; }
+.algo-run { width: 48px; height: 48px; border: 0; border-radius: 50%; background: #2f6bff; color: white; font-size: 18px; cursor: pointer; }
+.algo-reset, .algo-cmd, .algo-slot { border: 1px solid var(--line); background: white; border-radius: 10px; cursor: pointer; color: var(--ink); }
+.algo-reset { padding: 8px 10px; }
+.algo-row { align-items: flex-start; }
+.algo-fn { width: 28px; font-weight: 700; padding-top: 10px; }
+.algo-slots, .algo-palette { display: flex; flex-wrap: wrap; gap: 6px; }
+.algo-slot { width: 52px; height: 48px; display: grid; place-items: center; position: relative; }
+.algo-slot.hot { outline: 2px solid #2f6bff; }
+.algo-slot .swatch { position: absolute; left: 4px; right: 4px; top: 4px; height: 4px; border-radius: 99px; background: #9aa8bd; }
+.algo-slot .swatch.red { background: #ff5d6c; }
+.algo-slot .swatch.orange { background: #ff9f43; }
+.algo-slot .swatch.cyan { background: #3ecfe0; }
+.algo-slot b { font-size: 16px; }
+.algo-cmd { min-width: 52px; min-height: 48px; padding: 6px; display: grid; place-items: center; }
+.algo-cmd span { display: block; font-size: 10px; color: var(--muted); }
+.algo-cmd[aria-pressed='true'] { border-color: #2f6bff; box-shadow: inset 0 0 0 1px #2f6bff; }
+.algo-color { width: 42px; height: 48px; border: 0; }
+.algo-color.red { background: #ff5d6c; }
+.algo-color.orange { background: #ff9f43; }
+.algo-color.cyan { background: #3ecfe0; }
+.algo-color[aria-pressed='true'] { outline: 2px solid #172033; }
+.algo-game button:disabled { cursor: default; opacity: .55; }
+.algo-game button:focus-visible { outline: 3px solid #2f6bff; outline-offset: 2px; }
+.algo-status, .algo-results { margin-top: 10px; background: white; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.algo-results p + p { margin-top: 6px; }
+@media (max-width: 860px) { .algo-layout { grid-template-columns: 1fr; } }

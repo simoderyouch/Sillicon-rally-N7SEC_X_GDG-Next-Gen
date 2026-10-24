@@ -1,0 +1,439 @@
+import { useEffect, useRef, useState } from "react";
+import type { GameDefinition, GameProps } from "../types";
+
+const DURATION_SECONDS = 300;
+const TARGET_SCORE = 5000;
+
+function Game({
+  mission,
+  onComplete,
+  disabled = false,
+}: GameProps) {
+  const [remaining, setRemaining] = useState(DURATION_SECONDS);
+  const [pacmanScore, setPacmanScore] = useState(0);
+  const [started, setStarted] = useState(false);
+  const [finished, setFinished] = useState(false);
+
+  const frameRef = useRef<HTMLIFrameElement>(null);
+  const scoreRef = useRef(0);
+  const startedRef = useRef(false);
+  const finishedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  const maxScoreRef = useRef(mission.maxScore);
+  const deadlineRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+    maxScoreRef.current = mission.maxScore;
+  }, [onComplete, mission.maxScore]);
+
+  function finish() {
+    if (finishedRef.current) return;
+    finishedRef.current = true;
+
+    setFinished(true);
+
+    frameRef.current?.contentWindow?.postMessage(
+      { source: "silicon-rally", type: "stop" },
+      window.location.origin
+    );
+
+    const rawScore = scoreRef.current;
+
+    const finalScore = Math.min(
+      maxScoreRef.current,
+      Math.max(
+        0,
+        Math.round(
+          (rawScore / TARGET_SCORE) * maxScoreRef.current
+        )
+      )
+    );
+
+    onCompleteRef.current({
+      score: finalScore,
+      completed: true,
+      details: {
+        source: "pacman",
+        pacmanScore: rawScore,
+        durationSeconds: DURATION_SECONDS,
+      },
+    });
+  }
+
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      if (event.origin !== window.location.origin) return;
+      if (event.source !== frameRef.current?.contentWindow) return;
+
+      const data = event.data;
+
+      if (data?.source !== "silicon-pacman") return;
+      if (disabled || finishedRef.current) return;
+
+      if (data.type === "started" && !startedRef.current) {
+        startedRef.current = true;
+        deadlineRef.current = Date.now() + DURATION_SECONDS * 1000;
+        setStarted(true);
+      }
+
+      if (data.type === "score" && startedRef.current) {
+        const score = Number(data.score);
+
+        if (Number.isFinite(score) && score >= 0) {
+          scoreRef.current = Math.max(scoreRef.current, score);
+          setPacmanScore(scoreRef.current);
+        }
+      }
+    }
+
+    window.addEventListener("message", handleMessage);
+
+    return () => window.removeEventListener("message", handleMessage);
+  }, [disabled]);
+
+  useEffect(() => {
+    if (!started || finished || disabled) return;
+
+    const timer = window.setInterval(() => {
+      if (deadlineRef.current === null) return;
+
+      const seconds = Math.max(
+        0,
+        Math.ceil((deadlineRef.current - Date.now()) / 1000)
+      );
+
+      setRemaining(seconds);
+
+      if (seconds === 0) {
+        window.clearInterval(timer);
+        finish();
+      }
+    }, 250);
+
+    return () => window.clearInterval(timer);
+  }, [started, finished, disabled]);
+
+  const minutes = Math.floor(remaining / 60);
+  const seconds = remaining % 60;
+
+  const formattedTime =
+    `${String(minutes).padStart(2, "0")}:` +
+    `${String(seconds).padStart(2, "0")}`;
+
+  return (
+    <section className="game-shell">
+      <div className="game-briefing">
+        <p className="eyebrow">Silicon Rally · Arcade Challenge</p>
+        <h1>{mission.title}</h1>
+        <p className="lede">
+          Ramasse les points, évite les fantômes et réalise
+          le meilleur score possible en cinq minutes !
+        </p>
+      </div>
+
+      <div className="game-workbench">
+        <div className="workbench-header">
+          <span className="workbench-dot" />
+          <span>Pac-Man Challenge</span>
+          <small>Maximum : {mission.maxScore} pts</small>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 16,
+            padding: 16,
+            flexWrap: "wrap",
+          }}
+        >
+          <strong>Temps : {formattedTime}</strong>
+          <strong>Score Pac-Man : {pacmanScore}</strong>
+        </div>
+
+        <div
+          style={{
+            position: "relative",
+            background: "#000",
+            overflow: "hidden",
+          }}
+        >
+          <iframe
+            ref={frameRef}
+            title="Pac-Man Silicon Rally"
+            src="/pacman/index.html"
+            style={{
+              display: "block",
+              width: "100%",
+              height: 700,
+              border: 0,
+              pointerEvents:
+                disabled || finished ? "none" : "auto",
+            }}
+          />
+
+          {(disabled || finished) && (
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "grid",
+                placeItems: "center",
+                background: "rgba(0,0,0,0.75)",
+                color: "#fff",
+                fontSize: 24,
+                fontWeight: "bold",
+              }}
+            >
+              {finished ? "PARTIE TERMINÉE" : "MISSION INDISPONIBLE"}
+            </div>
+          )}
+        </div>
+
+        <div className="workbench-footer">
+          <span>
+            {finished
+              ? "Résultat envoyé"
+              : started
+                ? "Partie en cours"
+                : "Clique sur PLAY pour démarrer"}
+          </span>
+          <span>Flèches du clavier pour jouer</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export const game: GameDefinition = {
+  slug: "pacman",
+  component: Game,
+};port { useState } from "react";
+import type { GameDefinition, GameProps } from "../types";
+
+function Game({ mission, onComplete, disabled = false }: GameProps) {
+  const [score, setScore] = useState(0);
+
+  function finish() {
+    onComplete({
+      score: Math.min(Math.max(score, 0), mission.maxScore),
+      completed: true,
+      details: { source: "pacman" },
+    });
+  }
+
+  return (
+    <section className="game-shell">
+      <div className="game-briefing"><p className="eyebrow">Challenge pacman · puzzle briefing</p><h1>{mission.title}</h1><p className="lede">Replace this staimport { useEffect, useRef, useState } from "react";
+import type { GameDefinition, GameProps } from "../types";
+
+const DURATION_SECONDS = 300;
+const TARGET_SCORE = 5000;
+
+function Game({
+  mission,
+  onComplete,
+  disabled = false,
+}: GameProps) {
+  const [remaining, setRemaining] = useState(DURATION_SECONDS);
+  const [pacmanScore, setPacmanScore] = useState(0);
+  const [started, setStarted] = useState(false);
+  const [finished, setFinished] = useState(false);
+
+  const frameRef = useRef<HTMLIFrameElement>(null);
+  const scoreRef = useRef(0);
+  const startedRef = useRef(false);
+  const finishedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  const maxScoreRef = useRef(mission.maxScore);
+  const deadlineRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+    maxScoreRef.current = mission.maxScore;
+  }, [onComplete, mission.maxScore]);
+
+  function finish() {
+    if (finishedRef.current) return;
+    finishedRef.current = true;
+
+    setFinished(true);
+
+    frameRef.current?.contentWindow?.postMessage(
+      { source: "silicon-rally", type: "stop" },
+      window.location.origin
+    );
+
+    const rawScore = scoreRef.current;
+
+    const finalScore = Math.min(
+      maxScoreRef.current,
+      Math.max(
+        0,
+        Math.round(
+          (rawScore / TARGET_SCORE) * maxScoreRef.current
+        )
+      )
+    );
+
+    onCompleteRef.current({
+      score: finalScore,
+      completed: true,
+      details: {
+        source: "pacman",
+        pacmanScore: rawScore,
+        durationSeconds: DURATION_SECONDS,
+      },
+    });
+  }
+
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      if (event.origin !== window.location.origin) return;
+      if (event.source !== frameRef.current?.contentWindow) return;
+
+      const data = event.data;
+
+      if (data?.source !== "silicon-pacman") return;
+      if (disabled || finishedRef.current) return;
+
+      if (data.type === "started" && !startedRef.current) {
+        startedRef.current = true;
+        deadlineRef.current = Date.now() + DURATION_SECONDS * 1000;
+        setStarted(true);
+      }
+
+      if (data.type === "score" && startedRef.current) {
+        const score = Number(data.score);
+
+        if (Number.isFinite(score) && score >= 0) {
+          scoreRef.current = Math.max(scoreRef.current, score);
+          setPacmanScore(scoreRef.current);
+        }
+      }
+    }
+
+    window.addEventListener("message", handleMessage);
+
+    return () => window.removeEventListener("message", handleMessage);
+  }, [disabled]);
+
+  useEffect(() => {
+    if (!started || finished || disabled) return;
+
+    const timer = window.setInterval(() => {
+      if (deadlineRef.current === null) return;
+
+      const seconds = Math.max(
+        0,
+        Math.ceil((deadlineRef.current - Date.now()) / 1000)
+      );
+
+      setRemaining(seconds);
+
+      if (seconds === 0) {
+        window.clearInterval(timer);
+        finish();
+      }
+    }, 250);
+
+    return () => window.clearInterval(timer);
+  }, [started, finished, disabled]);
+
+  const minutes = Math.floor(remaining / 60);
+  const seconds = remaining % 60;
+
+  const formattedTime =
+    `${String(minutes).padStart(2, "0")}:` +
+    `${String(seconds).padStart(2, "0")}`;
+
+  return (
+    <section className="game-shell">
+      <div className="game-briefing">
+        <p className="eyebrow">Silicon Rally · Arcade Challenge</p>
+        <h1>{mission.title}</h1>
+        <p className="lede">
+          Ramasse les points, évite les fantômes et réalise
+          le meilleur score possible en cinq minutes !
+        </p>
+      </div>
+
+      <div className="game-workbench">
+        <div className="workbench-header">
+          <span className="workbench-dot" />
+          <span>Pac-Man Challenge</span>
+          <small>Maximum : {mission.maxScore} pts</small>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 16,
+            padding: 16,
+            flexWrap: "wrap",
+          }}
+        >
+          <strong>Temps : {formattedTime}</strong>
+          <strong>Score Pac-Man : {pacmanScore}</strong>
+        </div>
+
+        <div
+          style={{
+            position: "relative",
+            background: "#000",
+            overflow: "hidden",
+          }}
+        >
+          <iframe
+            ref={frameRef}
+            title="Pac-Man Silicon Rally"
+            src="/pacman/index.html"
+            style={{
+              display: "block",
+              width: "100%",
+              height: 700,
+              border: 0,
+              pointerEvents:
+                disabled || finished ? "none" : "auto",
+            }}
+          />
+
+          {(disabled || finished) && (
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "grid",
+                placeItems: "center",
+                background: "rgba(0,0,0,0.75)",
+                color: "#fff",
+                fontSize: 24,
+                fontWeight: "bold",
+              }}
+            >
+              {finished ? "PARTIE TERMINÉE" : "MISSION INDISPONIBLE"}
+            </div>
+          )}
+        </div>
+
+        <div className="workbench-footer">
+          <span>
+            {finished
+              ? "Résultat envoyé"
+              : started
+                ? "Partie en cours"
+                : "Clique sur PLAY pour démarrer"}
+          </span>
+          <span>Flèches du clavier pour jouer</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export const game: GameDefinition = {
+  slug: "pacman",
+  component: Game,
+};

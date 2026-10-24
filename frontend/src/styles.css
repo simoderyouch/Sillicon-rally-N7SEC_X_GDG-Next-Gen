@@ -216,3 +216,21 @@ input, select { background: rgba(5, 2, 16, .67); border-color: rgba(170, 109, 25
 @media (max-width: 620px) { .app-shell::before, .app-shell::after { display: none; } .main-nav a { gap: 4px; } .main-nav a svg { display: none; } .mission-card { min-height: 258px; } }
 
 .cabinet-light { background: none; border-radius: 0; height: 14px; width: 14px; }
+
+/* /play uses the approved artwork. Overlays share the stage's coordinate space. */
+.app-shell.app-shell--home { height: 100vh; margin: 0; max-width: none; overflow: auto; padding: 0; width: 100%; }
+.app-shell.app-shell--home::before, .app-shell.app-shell--home::after { display: none; }
+.page-content--home { min-height: 100%; }
+body:has(.app-shell--home) { background: #060b1e; overflow: auto; }
+body:has(.app-shell--home)::before, body:has(.app-shell--home)::after { display: none; }
+.home-stage { aspect-ratio: 1672 / 941; container-type: inline-size; flex: 0 0 auto; margin: 0 auto; min-width: 1100px; position: relative; width: min(100%, calc(100vh * 1672 / 941)); }
+.home-stage img { display: block; height: 100%; object-fit: fill; pointer-events: none; user-select: none; width: 100%; }
+.home-sr { border: 0; clip: rect(0 0 0 0); clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; white-space: nowrap; width: 1px; }
+.home-hit, .home-submit { background: transparent; border: 0; color: transparent; display: block; font-size: 0; padding: 0; position: absolute; }
+.home-submit { cursor: pointer; }
+.home-field { appearance: none; background: #050d24; border: 0; border-radius: 0; box-shadow: none; caret-color: #f4f7ff; color: #f4f7ff; color-scheme: dark; font-family: "Space Grotesk", sans-serif; font-size: 1.15cqw; font-weight: 500; height: 100%; line-height: 1; margin: 0; min-height: 0; outline: none; padding: 0.5cqw 0.55cqw 0; position: absolute; }
+.home-stage input.home-field:focus { border: 0; box-shadow: none; }
+.home-field:-webkit-autofill { -webkit-text-fill-color: #f4f7ff; box-shadow: 0 0 0 1000px #050d24 inset; }
+.home-hit:focus-visible, .home-submit:focus-visible, .home-field:focus-visible { outline: 2px solid #7ee7ff; outline-offset: 1px; }
+.home-status { background: #120816; color: #f4f7ff; font-family: "Space Grotesk", sans-serif; font-size: 0.95cqw; line-height: 1.35; margin: 0; overflow: auto; padding: 0.45cqw 0.6cqw; position: absolute; z-index: 2; }
+.home-status-error { background: #2a0c18; color: #ffd5e1; }
