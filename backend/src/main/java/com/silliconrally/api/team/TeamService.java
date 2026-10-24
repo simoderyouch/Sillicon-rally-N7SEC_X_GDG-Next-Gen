@@ -2,8 +2,6 @@ package com.silliconrally.api.team;
 
 import java.util.List;
 import java.util.UUID;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,16 +16,16 @@ public class TeamService {
   private final SessionTokenService tokens;
   private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
   private final boolean openRegistration;
-  private final String sharedJoinCode;
+  private final TeamJoinCodeService joinCodes;
 
-  public TeamService(TeamRepository teams, SessionTokenService tokens, @Value("${app.event.open-team-registration}") boolean openRegistration, @Value("${app.event.team-join-code:}") String sharedJoinCode) { this.teams = teams; this.tokens = tokens; this.openRegistration = openRegistration; this.sharedJoinCode = sharedJoinCode == null ? "" : sharedJoinCode.trim(); }
+  public TeamService(TeamRepository teams, SessionTokenService tokens, TeamJoinCodeService joinCodes, @Value("${app.event.open-team-registration}") boolean openRegistration) { this.teams = teams; this.tokens = tokens; this.joinCodes = joinCodes; this.openRegistration = openRegistration; }
 
   public TeamDtos.TeamSessionResponse join(TeamDtos.JoinRequest request) {
     String suppliedCode = request.joinCode() == null ? "" : request.joinCode();
     String name = request.teamName().trim();
     Team team = teams.findByDisplayNameIgnoreCase(name).orElse(null);
-    if (!sharedJoinCode.isEmpty()) {
-      if (!MessageDigest.isEqual(sharedJoinCode.getBytes(StandardCharsets.UTF_8), suppliedCode.getBytes(StandardCharsets.UTF_8))) {
+    if (joinCodes.isConfigured()) {
+      if (!joinCodes.matches(suppliedCode)) {
         throw new ResponseStatusException(FORBIDDEN, "Invalid event join code");
       }
     } else if (team != null) {
@@ -42,7 +40,7 @@ public class TeamService {
 
   private Team createOpenRegistrationTeam(String name) {
     if (!openRegistration) throw new ResponseStatusException(FORBIDDEN, "Team registration is closed");
-    if (sharedJoinCode.isEmpty()) throw new ResponseStatusException(SERVICE_UNAVAILABLE, "Team joining is unavailable until the organizer configures APP_TEAM_JOIN_CODE");
+    if (!joinCodes.isConfigured()) throw new ResponseStatusException(SERVICE_UNAVAILABLE, "Team joining is unavailable until the organizer configures a shared event join code");
     return teams.save(new Team(name, null));
   }
 

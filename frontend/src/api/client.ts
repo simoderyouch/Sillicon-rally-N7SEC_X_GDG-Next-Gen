@@ -1,4 +1,4 @@
-import type { AdminSession, EventState, GameScoreResponse, LeaderboardEntry, Mission, Team, TeamSession } from "./types";
+import type { AdminSession, EventState, GameScoreResponse, LeaderboardEntry, Mission, Team, TeamJoinCodeStatus, TeamSession } from "./types";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.DEV ? "http://localhost:8080" : "");
 
@@ -45,6 +45,8 @@ export const api = {
       headers: { "X-Admin-Token": token },
       body: JSON.stringify(patch),
     }),
+  adminTeamJoinCode: (token: string) => request<TeamJoinCodeStatus>("/api/v1/admin/team-join-code", { headers: { "X-Admin-Token": token } }),
+  updateAdminTeamJoinCode: (token: string, joinCode: string) => request<TeamJoinCodeStatus>("/api/v1/admin/team-join-code", { method: "PUT", headers: { "X-Admin-Token": token }, body: JSON.stringify({ joinCode }) }),
   adminMissions: (token: string) => request<Mission[]>("/api/v1/admin/missions", { headers: { "X-Admin-Token": token } }),
   createMission: (token: string, mission: Omit<Mission, "id">) => request<Mission>("/api/v1/admin/missions", { method: "POST", headers: { "X-Admin-Token": token }, body: JSON.stringify(mission) }),
   updateMission: (token: string, id: string, mission: Omit<Mission, "id">) => request<Mission>(`/api/v1/admin/missions/${id}`, { method: "PUT", headers: { "X-Admin-Token": token }, body: JSON.stringify(mission) }),

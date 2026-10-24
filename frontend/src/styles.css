@@ -240,3 +240,9 @@ input, select { background: rgba(5, 2, 16, .67); border-color: rgba(170, 109, 25
 .team-welcome svg { color: #65ffc0; flex: 0 0 auto; }
 .team-welcome strong { color: #8cffca; margin-right: 4px; }
 .team-badge small { color: #77ffc0; }
+.admin-join-code-card { margin: 22px 0; }
+.admin-join-code-card > p:not(.form-kicker) { color: #c7b8da; margin: 8px 0 16px; max-width: 760px; }
+.admin-join-code-card form { align-items: end; display: grid; gap: 14px; grid-template-columns: minmax(220px, 1fr) auto; }
+.admin-join-code-card .panel-heading { align-items: center; }
+.success-copy { color: #7fffc7; }
+@media (max-width: 620px) { .admin-join-code-card form { grid-template-columns: 1fr; } }
