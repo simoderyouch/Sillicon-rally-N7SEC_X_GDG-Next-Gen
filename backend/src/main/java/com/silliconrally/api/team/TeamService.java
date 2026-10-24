@@ -2,6 +2,8 @@ package com.silliconrally.api.team;
 
 import java.util.List;
 import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,14 +18,19 @@ public class TeamService {
   private final SessionTokenService tokens;
   private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
   private final boolean openRegistration;
+  private final String sharedJoinCode;
 
-  public TeamService(TeamRepository teams, SessionTokenService tokens, @Value("${app.event.open-team-registration}") boolean openRegistration) { this.teams = teams; this.tokens = tokens; this.openRegistration = openRegistration; }
+  public TeamService(TeamRepository teams, SessionTokenService tokens, @Value("${app.event.open-team-registration}") boolean openRegistration, @Value("${app.event.team-join-code:}") String sharedJoinCode) { this.teams = teams; this.tokens = tokens; this.openRegistration = openRegistration; this.sharedJoinCode = sharedJoinCode == null ? "" : sharedJoinCode.trim(); }
 
   public TeamDtos.TeamSessionResponse join(TeamDtos.JoinRequest request) {
+    String suppliedCode = request.joinCode() == null ? "" : request.joinCode();
+    if (!sharedJoinCode.isEmpty() && !MessageDigest.isEqual(sharedJoinCode.getBytes(StandardCharsets.UTF_8), suppliedCode.getBytes(StandardCharsets.UTF_8))) {
+      throw new ResponseStatusException(FORBIDDEN, "Invalid event join code");
+    }
     String name = request.teamName().trim();
-    Team team = teams.findByDisplayNameIgnoreCase(name).orElseGet(() -> createOpenRegistrationTeam(name, request.joinCode()));
+    Team team = teams.findByDisplayNameIgnoreCase(name).orElseGet(() -> createOpenRegistrationTeam(name, sharedJoinCode.isEmpty() ? request.joinCode() : null));
     if (team.getStatus() != TeamStatus.ACTIVE) throw new ResponseStatusException(FORBIDDEN, "This team is inactive");
-    if (team.getJoinCodeHash() != null && !encoder.matches(request.joinCode() == null ? "" : request.joinCode(), team.getJoinCodeHash())) throw new ResponseStatusException(FORBIDDEN, "Invalid team join code");
+    if (sharedJoinCode.isEmpty() && team.getJoinCodeHash() != null && !encoder.matches(suppliedCode, team.getJoinCodeHash())) throw new ResponseStatusException(FORBIDDEN, "Invalid team join code");
     return new TeamDtos.TeamSessionResponse(tokens.issueTeamToken(team.getId()), TeamDtos.from(team));
   }
 
