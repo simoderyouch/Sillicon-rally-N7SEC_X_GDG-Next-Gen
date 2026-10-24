@@ -46,7 +46,7 @@ export const api = {
       body: JSON.stringify(patch),
     }),
   adminTeamJoinCode: (token: string) => request<TeamJoinCodeStatus>("/api/v1/admin/team-join-code", { headers: { "X-Admin-Token": token } }),
-  updateAdminTeamJoinCode: (token: string, joinCode: string) => request<TeamJoinCodeStatus>("/api/v1/admin/team-join-code", { method: "PUT", headers: { "X-Admin-Token": token }, body: JSON.stringify({ joinCode }) }),
+  updateAdminTeamJoinCode: (token: string, joinCode: string) => request<TeamJoinCodeStatus>("/api/v1/admin/team-join-code", { method: "PATCH", headers: { "X-Admin-Token": token }, body: JSON.stringify({ joinCode }) }),
   adminMissions: (token: string) => request<Mission[]>("/api/v1/admin/missions", { headers: { "X-Admin-Token": token } }),
   createMission: (token: string, mission: Omit<Mission, "id">) => request<Mission>("/api/v1/admin/missions", { method: "POST", headers: { "X-Admin-Token": token }, body: JSON.stringify(mission) }),
   updateMission: (token: string, id: string, mission: Omit<Mission, "id">) => request<Mission>(`/api/v1/admin/missions/${id}`, { method: "PUT", headers: { "X-Admin-Token": token }, body: JSON.stringify(mission) }),
