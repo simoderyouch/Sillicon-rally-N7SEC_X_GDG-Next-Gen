@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
-import { ArrowUpRight, CheckCircle2, CircleDot, Construction, Play, Sparkles } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { ArrowUpRight, CheckCircle2, CircleDot, Construction, Play, Sparkles, UsersRound } from "lucide-react";
 import { api } from "../api/client";
 import { games } from "../games/registry";
 import { getTeamName, getTeamToken } from "../teamSession";
 
 export function GameList() {
+  const location = useLocation();
+  const teamJoined = Boolean((location.state as { teamJoined?: boolean } | null)?.teamJoined);
   const teamName = getTeamName();
   const teamToken = getTeamToken();
   const { data, isPending, error } = useQuery({ queryKey: ["missions"], queryFn: api.missions });
@@ -14,8 +16,9 @@ export function GameList() {
   return <section className="mission-board">
     <div className="page-heading">
       <div><p className="eyebrow"><Sparkles size={13} /> Challenge board · event arena</p><h1>Pick a<br /><em>challenge.</em></h1></div>
-      <div className="team-badge"><CircleDot className="team-badge-dot" size={15} /><div><small>Operator</small><strong>{teamName}</strong></div></div>
+      <div className="team-badge"><CircleDot className="team-badge-dot" size={15} /><div><small>Team session active</small><strong>{teamName}</strong></div></div>
     </div>
+    {teamJoined && <div className="team-welcome" role="status"><UsersRound size={18} /><span><strong>You're checked in, {teamName}.</strong> Your progress is saved to this team.</span></div>}
     {isPending && <p className="loading-copy">Loading authorised challenges…</p>}
     {error && <p className="error" role="alert">{error.message}</p>}
     {scores.error && <p className="error" role="alert">Could not load your completed challenges: {scores.error.message}</p>}
