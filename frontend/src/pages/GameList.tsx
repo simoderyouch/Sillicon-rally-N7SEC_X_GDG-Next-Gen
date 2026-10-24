@@ -26,7 +26,7 @@ export function GameList() {
       return <article className={`mission-card ${hasGame ? "is-ready" : "is-waiting"} ${isFinished ? "is-completed" : ""}`} key={mission.id}>
         <div className="mission-card-top"><span className="mission-number"><span className="mission-index">{String(index + 1).padStart(2, "0")}</span> CH</span><span className={`mission-status ${isFinished ? "mission-status-completed" : ""}`}>{isFinished ? <><CheckCircle2 size={13} /> Finished · {savedScore?.score} pts</> : hasGame ? <><Play size={12} fill="currentColor" /> Challenge ready</> : <><Construction size={12} /> Provisioning</>}</span></div>
         <div><h2>{mission.title}</h2><p>{mission.description}</p></div>
-        <div className="mission-card-bottom"><span><b>{mission.maxScore}</b> point ceiling</span>{hasGame ? <Link className="mission-link" to={`/games/${mission.slug}`}>{isFinished ? "View challenge" : "Open challenge"} <ArrowUpRight size={16} /></Link> : <span className="muted-label">Build in progress</span>}</div>
+        <div className="mission-card-bottom"><span><b>{mission.maxScore}</b> point ceiling</span>{isFinished ? <span className="muted-label mission-locked">Finished · challenge locked</span> : hasGame ? <Link className="mission-link" to={`/games/${mission.slug}`}>Open challenge <ArrowUpRight size={16} /></Link> : <span className="muted-label">Build in progress</span>}</div>
       </article>;
     })}</div>
   </section>;
