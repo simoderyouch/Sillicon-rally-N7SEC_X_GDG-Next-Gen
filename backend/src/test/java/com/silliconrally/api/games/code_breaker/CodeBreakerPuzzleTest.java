@@ -1,22 +1,18 @@
 package com.silliconrally.api.games.code_breaker;
 
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class CodeBreakerPuzzleTest {
   private final CodeBreakerPuzzle puzzle = new CodeBreakerPuzzle();
 
   @Test
-  void generates_a_stable_but_team_specific_code() {
-    UUID firstTeam = UUID.fromString("11111111-1111-1111-1111-111111111111");
-    UUID secondTeam = UUID.fromString("22222222-2222-2222-2222-222222222222");
-
-    assertEquals(puzzle.answerFor(firstTeam, 2), puzzle.answerFor(firstTeam, 2));
-    assertNotEquals(puzzle.answerFor(firstTeam, 2), puzzle.answerFor(secondTeam, 2));
+  void exposes_the_fixed_code_for_each_round() {
+    assertEquals(List.of("comet", "orbit", "spark"), puzzle.answerFor(0));
+    assertEquals(List.of("spark", "moon", "orbit"), puzzle.answerFor(1));
+    assertEquals(List.of("moon", "bolt", "moon", "leaf", "orbit"), puzzle.answerFor(2));
   }
 
   @Test

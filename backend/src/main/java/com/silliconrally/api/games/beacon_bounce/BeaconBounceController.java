@@ -17,6 +17,8 @@ public class BeaconBounceController {
   public BeaconBounceController(SessionTokenService tokens, BeaconBounceRunService runs) { this.tokens = tokens; this.runs = runs; }
 
   public record AttemptRequest(@NotBlank String runId, @Min(0) @Max(5) int round, @NotBlank String beacon) { }
+  public record HintRequest(@NotBlank String runId, @Min(0) @Max(5) int round) { }
   @PostMapping("/runs") public BeaconBounceRunService.StartResponse start(@RequestHeader(value = "X-Team-Token", required = false) String token) { return runs.start(tokens.requireTeam(token)); }
   @PostMapping("/attempt") public BeaconBounceRunService.AttemptResponse attempt(@RequestHeader(value = "X-Team-Token", required = false) String token, @Valid @RequestBody AttemptRequest request) { UUID teamId = tokens.requireTeam(token); return runs.attempt(teamId, request.runId(), request.round(), request.beacon()); }
+  @PostMapping("/hint") public BeaconBounceRunService.HintResponse hint(@RequestHeader(value = "X-Team-Token", required = false) String token, @Valid @RequestBody HintRequest request) { UUID teamId = tokens.requireTeam(token); return runs.hint(teamId, request.runId(), request.round()); }
 }

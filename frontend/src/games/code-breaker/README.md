@@ -2,7 +2,7 @@
 
 ## Game plan
 
-Code Breaker is a three-round deduction puzzle for teams. Every team receives its own stable set of hidden codes: refreshing the page preserves a team's puzzle, while another team receives different sequences. Players assemble a sequence from eight symbols and submit it to uncover three clear clues:
+Code Breaker is a three-round deduction puzzle for teams. Every team receives the same fixed set of hidden codes. Players assemble a sequence from eight symbols and submit it to uncover three clear clues:
 
 - **Exact** — the right symbol in the right slot.
 - **Shifted** — the right symbol, but in a different slot.
@@ -28,8 +28,8 @@ The shared score route compares that dispatched result against the completed ser
 
 ## Test coverage
 
-`Game.test.tsx` verifies a full-score three-round run, feedback categories, team-specific hint display, and the required final dispatch after missed rounds. `CodeBreakerPuzzleTest` verifies stable team-specific generation and duplicate-safe feedback. `CodeBreakerRunServiceTest` verifies that a failed round advances and cannot be replayed.
+`Game.test.tsx` verifies a full-score three-round run, feedback categories, server-provided hint display, and the required final dispatch after missed rounds. `CodeBreakerPuzzleTest` verifies the fixed sequences and duplicate-safe feedback. `CodeBreakerRunServiceTest` verifies that a failed round advances and cannot be replayed.
 
 ## Scope
 
-The frontend never calls the shared score API directly; it reports the final result once through `onComplete`. Its isolated backend package exposes start, attempt, and hint endpoints. Those endpoints authenticate the team session, derive each team's code from its UUID, and keep the competition run in Redis without editing platform score or event data.
+The frontend never calls the shared score API directly; it reports the final result once through `onComplete`. Its isolated backend package exposes start, attempt, and hint endpoints. Those endpoints authenticate the team session, use the same fixed sequence for every team, and keep the competition run in Redis without editing platform score or event data.

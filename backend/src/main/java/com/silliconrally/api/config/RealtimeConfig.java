@@ -16,13 +16,13 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class RealtimeConfig implements WebSocketConfigurer {
   private final LeaderboardWebSocketHandler leaderboardHandler;
-  private final String allowedOrigin;
+  private final TrustedOrigins trustedOrigins;
 
-  public RealtimeConfig(LeaderboardWebSocketHandler leaderboardHandler, @Value("${app.cors.allowed-origin}") String allowedOrigin) { this.leaderboardHandler = leaderboardHandler; this.allowedOrigin = allowedOrigin; }
+  public RealtimeConfig(LeaderboardWebSocketHandler leaderboardHandler, TrustedOrigins trustedOrigins) { this.leaderboardHandler = leaderboardHandler; this.trustedOrigins = trustedOrigins; }
 
   @Override
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-    registry.addHandler(leaderboardHandler, "/ws/leaderboard").setAllowedOriginPatterns(allowedOrigin);
+    registry.addHandler(leaderboardHandler, "/ws/leaderboard").setAllowedOrigins(trustedOrigins.asArray());
   }
 
   @Bean

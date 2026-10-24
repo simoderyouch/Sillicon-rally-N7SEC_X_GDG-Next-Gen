@@ -23,13 +23,13 @@ Rounds 1–3 teach the rhythm. Round 4 is the hard-mode breakpoint: routes becom
 
 ## Competition integrity
 
-Starting the game creates one random six-route run in Redis for the authenticated team. Refreshing or reopening the page restores that same run; it does not generate another route or reset the score. Every beacon selection is validated against the stored route by the private backend endpoint. After a wrong selection, the only available action is dispatching the points secured before the failure.
+Starting the game creates one random six-route run in Redis for the authenticated team. Refreshing or reopening the page restores that same run; it does not reset the score. A team has three new-route hints for the entire run. Before selecting a beacon, a hint replaces the active route with a different random route and deducts twice that round's points from the server-verified score. Every beacon selection is validated against the stored route by the private backend endpoint. After a wrong selection, the only available action is dispatching the points secured before the failure.
 
 When the platform receives that dispatch, it compares the submitted points and completion state with the terminal Redis run. A forged or early browser score is rejected.
 
 ## Test coverage
 
-`Game.test.tsx` verifies server-started routes, backend-verified beacon attempts, and the dispatch-only state after a failure. `BeaconBounceRunServiceTest` verifies random route shape, persistent team state, and terminal failures.
+`Game.test.tsx` verifies server-started routes, the penalized three-hint new-route flow, backend-verified beacon attempts, and the dispatch-only state after a failure. `BeaconBounceRunServiceTest` verifies random route shape, persistent team state, penalized replacements, and terminal failures.
 
 ## Scope
 

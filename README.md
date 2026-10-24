@@ -16,20 +16,21 @@ New implementation of the team cybersecurity game: React frontend, Spring Boot b
 
 ```bash
 cp .env.example .env
-docker compose up -d postgres redis
-
-cd backend
-ADMIN_EMAIL=admin@sillicon-rally.local ADMIN_PASSWORD=admin-gdg \
-SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/sillicon_rally \
-SPRING_DATASOURCE_USERNAME=sillicon SPRING_DATASOURCE_PASSWORD=change-me \
-mvn spring-boot:run
-
-cd ../frontend
-npm install
-npm run dev
+docker compose up --build -d
 ```
 
-The frontend starts on `http://localhost:5173`; the API starts on `http://localhost:8080`.
+The whole application is containerized: React/Nginx frontend, Spring Boot API,
+PostgreSQL, and Redis. Open `http://localhost:5173`; the frontend proxies `/api`
+and `/ws` to the API container, so browser traffic remains same-origin. Follow
+startup with `docker compose logs -f`, and stop the stack with `docker compose down`.
+
+Persistent PostgreSQL and Redis data are retained in named Docker volumes. To reset
+the local environment completely, run `docker compose down -v` (this deletes all
+local event data).
+
+For an OpenShip deployment behind `https://silicon-rally.edder.studio`, read
+[docs/OPENSHIP_DEPLOYMENT.md](docs/OPENSHIP_DEPLOYMENT.md). It documents the
+required trusted HTTPS origin and proxy-header chain for API and WebSocket traffic.
 
 ## Shared event sessions
 
@@ -70,11 +71,14 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/GAME_DEVELOPMENT.md](docs/GAME
 
 The generator creates an isolated frontend game folder and an optional private validation-endpoint package. A game completes through a callback; the shared runner submits the score to the locked backend route, so game developers never build, call, or modify scoring endpoints. A private endpoint may validate game-specific answers but cannot record points. Read [frontend/src/games/README.md](frontend/src/games/README.md) before starting a game.
 
-`frontend/src/games/intake/` is a deliberately small working reference game. It demonstrates the full flow: a game component receives a mission, reports completion through `onComplete`, and the shared runner sends its score to the API. New game teams should copy the template, not edit this reference game.
+Shipped games are automatically added to the admin mission catalogue as drafts on startup. Admins retain release control, and can still add custom challenges manually.
+
+`frontend/src/games/_template/` is the starter module for new games. A game component receives a mission, reports completion through `onComplete`, and the shared runner sends its score to the API.
 
 ## Project structure
 
 ```text
 frontend/  React + Vite + TypeScript
 backend/   Spring Boot + JPA + Flyway
+docker-compose.yml  Full local infrastructure stack
 ```
