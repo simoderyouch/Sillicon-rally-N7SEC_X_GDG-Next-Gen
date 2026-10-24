@@ -6,11 +6,11 @@ Slug: `password-chaos`. Twenty timed password puzzles. The game calls `onComplet
 
 Press **Start**. The briefing does not use challenge time. Each challenge shows every rule at once. Type a password that turns every rule green, then press **Validate** or Enter. A correct password scores immediately and the next countdown starts. There is no skip and no retry. When a countdown reaches zero, that challenge scores 0 and the next one starts.
 
-The deadline is an absolute timestamp in `localStorage`, keyed by team token and mission id: `rally:password-chaos:v2:{teamToken}:{missionId}`. Reloading or restarting the browser restores the active challenge and the remaining time. Time spent with the page closed still expires challenges, including several in a row.
+The deadline is an absolute timestamp in `localStorage`, keyed by team token and mission id: `rally:password-chaos:v3:{teamToken}:{missionId}`. Reloading or restarting the browser restores the active challenge and the remaining time. Time spent with the page closed still expires challenges, including several in a row. A refresh does not move the stored deadline.
 
-If every countdown runs out, the session lasts 525 seconds (8 minutes 45 seconds): 345 seconds across the HARD challenges and 180 seconds across EXPERT. A correct password still starts the next challenge immediately.
+If every countdown runs out, the session lasts 827 seconds (13 minutes 47 seconds): 547 seconds across the HARD challenges and 280 seconds across EXPERT. A correct password still starts the next challenge immediately.
 
-Sessions saved as `v1` used the retired shorter limits. Those deadlines are not resumed. Opening the game removes the old record and shows the briefing, with a note that the previous attempt was not continued. A `v2` session already in progress is left as it is.
+Sessions saved as `v1` used the retired 188-second limits. Sessions saved as `v2` used the retired 525-second limits. Those deadlines cannot be mapped onto the current countdowns: keeping them would either extend later challenges or score the speed bonus against the wrong limit. Opening the game removes the old record and shows the briefing, with a note that the previous attempt was not continued. A `v3` session already in progress is left as it is. This reset applies only to attempts saved before the 827-second timetable. It is not silent: the briefing states that the previous attempt was not resumed.
 
 ## Score
 

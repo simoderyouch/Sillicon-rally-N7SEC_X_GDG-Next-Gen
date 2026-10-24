@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { games } from '../registry';
 import { CHALLENGES, TOTAL_SECONDS } from './challenges';
 import { game } from './index';
-import { legacyStorageKey } from './persistence';
+import { retiredStorageKeys, storageKey } from './persistence';
 
 const mission = { id: 'pw-id', slug: 'password-chaos', title: 'Password Chaos', description: '', maxScore: 100, releaseState: 'PUBLISHED' as const };
 const Component = game.component;
@@ -30,7 +30,7 @@ describe('Password Chaos', () => {
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument();
     start();
     expect(screen.getByRole('heading', { name: 'Digital Equation' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Time remaining')).toHaveTextContent('18.0');
+    expect(screen.getByLabelText('Time remaining')).toHaveTextContent('30.0');
     answer('nope');
     expect(screen.getByRole('status')).toHaveTextContent(/not met/);
     expect(screen.getByRole('heading', { name: 'Digital Equation' })).toBeInTheDocument();
@@ -49,7 +49,7 @@ describe('Password Chaos', () => {
     view.unmount();
     render(<Component mission={mission} onComplete={complete} />);
     expect(screen.getByRole('heading', { name: 'Prime Hunter' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Time remaining')).toHaveTextContent('19.0');
+    expect(screen.getByLabelText('Time remaining')).toHaveTextContent('32.0');
     advance(CHALLENGES[1].seconds * 1000);
     expect(screen.getByRole('heading', { name: 'Product 24' })).toBeInTheDocument();
     expect(screen.getByText(/Score/).querySelector('strong')).toHaveTextContent('4.00');
@@ -72,11 +72,34 @@ describe('Password Chaos', () => {
   });
 
   it('does not resume a session saved with the retired time limits', () => {
-    localStorage.setItem(legacyStorageKey(mission.id), JSON.stringify({ phase: 'playing', index: 4, deadline: Date.now() + 1000, outcomes: [], draft: '11111000', handedOff: false, startedAt: Date.now(), finishedAt: null }));
+    retiredStorageKeys(mission.id).forEach(key => {
+      localStorage.clear();
+      localStorage.setItem(key, JSON.stringify({ phase: 'playing', index: 4, deadline: Date.now() + 1000, outcomes: [], draft: '11111000', handedOff: false, startedAt: Date.now(), finishedAt: null }));
+      const view = render(<Component mission={mission} onComplete={vi.fn()} />);
+      expect(screen.getByRole('status')).toHaveTextContent(/retired time limits/);
+      expect(screen.getByRole('button', { name: 'Start' })).toBeInTheDocument();
+      expect(localStorage.getItem(key)).toBeNull();
+      view.unmount();
+    });
+  });
+
+  it('shows the configured countdown and keeps a saved deadline absolute', () => {
+    const at = Date.now();
+    const playing = { phase: 'playing', outcomes: [], draft: '', handedOff: false, startedAt: at, finishedAt: null };
+    localStorage.setItem(storageKey(mission.id), JSON.stringify({ ...playing, index: 11, deadline: at + 50_000 }));
+    const twelfth = render(<Component mission={mission} onComplete={vi.fn()} />);
+    expect(screen.getByRole('heading', { name: 'N7SEC Cipher' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Time remaining')).toHaveTextContent('50.0');
+    advance(10_000);
+    expect(screen.getByLabelText('Time remaining')).toHaveTextContent('40.0');
+    expect(JSON.parse(localStorage.getItem(storageKey(mission.id)) ?? '{}').deadline).toBe(at + 50_000);
+    twelfth.unmount();
+
+    const later = Date.now();
+    localStorage.setItem(storageKey(mission.id), JSON.stringify({ ...playing, index: 19, deadline: later + 65_000, startedAt: later }));
     render(<Component mission={mission} onComplete={vi.fn()} />);
-    expect(screen.getByRole('status')).toHaveTextContent(/retired time limits/);
-    expect(screen.getByRole('button', { name: 'Start' })).toBeInTheDocument();
-    expect(localStorage.getItem(legacyStorageKey(mission.id))).toBeNull();
+    expect(screen.getByRole('heading', { name: 'Ultimate Password' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Time remaining')).toHaveTextContent('65.0');
   });
 
   it('waits to submit while the platform has disabled the game', () => {
